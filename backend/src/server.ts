@@ -1,16 +1,16 @@
 import express from "express";
-import type { Request, Response } from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-app.get("/", (req: Request, res: Response) => {
-  res.json({
-    message: "Hello Mohit",
-  });
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
 });
 
-const PORT = 7000;
-
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 7000;
+app.listen(PORT, () => console.log(`API running on port ${PORT}`));
