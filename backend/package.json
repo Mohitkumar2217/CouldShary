@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "mohit kumawat",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "node --watch server.js"
+  }
+}
