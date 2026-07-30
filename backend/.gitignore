@@ -1,3 +1,19 @@
+# env files
 .env
+.env.local
+.env.*.local
+
+# dependencies
 /node_modules
-package-lock.json
+
+# prisma generated client (custom output path)
+/src/generated/prisma
+
+# build outputs
+/dist
+/.next
+/build
+
+# misc
+.DS_Store
+*.log

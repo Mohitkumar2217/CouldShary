@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum Permission {
+  VIEW
+  DOWNLOAD
+  EDIT
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  files        File[]
+  folders      Folder[]
+  shareLinks   ShareLink[]
+  accessGrants FileAccessGrant[]
+}
+
+model Folder {
+  id             String    @id @default(uuid())
+  name           String
+  ownerId        String
+  owner          User      @relation(fields: [ownerId], references: [id])
+  parentFolderId String?
+  parentFolder   Folder?   @relation("FolderToFolder", fields: [parentFolderId], references: [id])
+  subfolders     Folder[]  @relation("FolderToFolder")
+  files          File[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([ownerId])
+  @@index([parentFolderId])
+}
+
+model File {
+  id          String    @id @default(uuid())
+  name        String
+  size        Int
+  mimeType    String
+  storageKey  String    // path/key inside the Supabase bucket
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  folderId    String?
+  folder      Folder?   @relation(fields: [folderId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  shareLinks    ShareLink[]
+  accessGrants  FileAccessGrant[]
+
+  @@index([ownerId])
+  @@index([folderId])
+}
+
+model ShareLink {
+  id            String     @id @default(uuid())
+  token         String     @unique
+  fileId        String
+  file          File       @relation(fields: [fileId], references: [id])
+  visibility    Visibility @default(PRIVATE)
+  passwordHash  String?
+  expiresAt     DateTime?
+  maxDownloads  Int?
+  downloadCount Int        @default(0)
+  createdById   String
+  createdBy     User       @relation(fields: [createdById], references: [id])
+  createdAt     DateTime   @default(now())
+  revokedAt     DateTime?
+
+  @@index([fileId])
+  @@index([token])
+}
+
+model FileAccessGrant {
+  id         String     @id @default(uuid())
+  fileId     String
+  file       File       @relation(fields: [fileId], references: [id])
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  permission Permission @default(VIEW)
+  createdAt  DateTime   @default(now())
+
+  @@unique([fileId, userId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  userId    String?
+  targetId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
