@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import path from "path";
-import { randomUUID } from "crypto";
+import { randomUUID, createHash } from "crypto";
 import { prisma } from "../db.js";
 import { supabaseAdmin } from "../supabase.js";
 
@@ -14,7 +14,23 @@ export const uploadFileController = async (req: Request, res: Response) => {
         }
         const { originalname, mimetype, size, buffer } = req.file;
         const { folderId } = req.body;  // optional - null means root
+        const contentHash = createHash("sha256").update(buffer).digest("hex");
 
+        const existing = await prisma.file.findFirst({
+            where: {
+                ownerId: req.user!.userId,
+                contentHash,
+                deletedAt: null,
+            }
+        });
+
+        if(existing) {
+            return res.status(200).json({
+                file: existing,
+                message: "Identical file already exists - reused existing copy",
+            });
+        }
+        
         // Namespace the storage key by user + a random suffix to avoid collisions
         const ext = path.extname(originalname);
         const storageKey = `${req.user!.userId}/${randomUUID()}${ext}`;
@@ -77,7 +93,7 @@ export const downloadFileController = async (req: Request, res: Response) => {
                 error: "File not found",
             });
         }
-        
+
         // ownership check - the core of Phase - 11's, worth doing now
         if (file.ownerId !== req.user!.userId) {
             return res.status(403).json({
