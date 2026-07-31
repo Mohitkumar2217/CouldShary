@@ -21,6 +21,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.1",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
     "nanoid": "^6.0.0",
     "prisma": "^6.19.3"
   },
@@ -30,6 +31,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
     "@types/node": "^24.13.3",
     "tsx": "^4.23.1",
     "typescript": "^5.9.3"

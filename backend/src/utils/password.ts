@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 12;
 
-export function hasPassword(plain: string) {
+export function hashPassword(plain: string) {
     return bcrypt.hash(plain, SALT_ROUNDS);
 }
 
