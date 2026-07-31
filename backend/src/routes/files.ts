@@ -11,4 +11,5 @@ const upload = multer({
     limits: {fileSize: 50 * 1024 * 1024}, // 50mb cap for this basic version
 });
 
-router.post("/upload", requireAuth, upload.single("file"), uploadFileController)
+router.post("/upload", requireAuth, upload.single("file"), uploadFileController);
+router.get("/:id/download", requireAuth, )
