@@ -62,6 +62,7 @@ model File {
   size        Int
   mimeType    String
   storageKey  String    // path/key inside the Supabase bucket
+  contentHash String    @db.VarChar(64)
   ownerId     String
   owner       User      @relation(fields: [ownerId], references: [id])
   folderId    String?

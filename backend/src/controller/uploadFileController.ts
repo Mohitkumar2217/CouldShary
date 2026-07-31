@@ -22,15 +22,15 @@ export const uploadFileController = async (req: Request, res: Response) => {
                 contentHash,
                 deletedAt: null,
             }
-        });
+        })
 
-        if(existing) {
+        if (existing) {
             return res.status(200).json({
                 file: existing,
                 message: "Identical file already exists - reused existing copy",
             });
         }
-        
+
         // Namespace the storage key by user + a random suffix to avoid collisions
         const ext = path.extname(originalname);
         const storageKey = `${req.user!.userId}/${randomUUID()}${ext}`;
@@ -59,6 +59,7 @@ export const uploadFileController = async (req: Request, res: Response) => {
                 name: originalname,
                 size,
                 mimeType: mimetype,
+                contentHash,
                 storageKey,
                 ownerId: req.user!.userId,
                 folderId: folderId || null,
