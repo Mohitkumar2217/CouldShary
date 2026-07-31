@@ -4,9 +4,6 @@ import { randomUUID } from "crypto";
 import { prisma } from "../db.js";
 import { supabaseAdmin } from "../supabase.js";
 
-interface FileParams {
-    id: string
-}
 
 export const uploadFileController = async (req: Request, res: Response) => {
     try {
@@ -61,12 +58,18 @@ export const uploadFileController = async (req: Request, res: Response) => {
     }
 }
 
-export const downloadFileController = async (req: Request<FileParams>, res: Response) => {
+export const downloadFileController = async (req: Request, res: Response) => {
     try {
+        const id = req.params.id;
+
+        if (typeof id !== "string") {
+            return res.status(400).json({
+                error: "Invalid file id",
+            });
+        }
+
         const file = await prisma.file.findUnique({
-            where: {
-                id: req.params.id
-            }
+            where: { id },
         });
 
         if (!file || file.deletedAt) {
@@ -74,7 +77,7 @@ export const downloadFileController = async (req: Request<FileParams>, res: Resp
                 error: "File not found",
             });
         }
-
+        
         // ownership check - the core of Phase - 11's, worth doing now
         if (file.ownerId !== req.user!.userId) {
             return res.status(403).json({
@@ -86,7 +89,7 @@ export const downloadFileController = async (req: Request<FileParams>, res: Resp
             .from(process.env.SUPABASE_STORAGE_BUCKET!)
             .createSignedUrl(file.storageKey, 60 * 5); // 5 - minute expiry
 
-        if(error || !data) {
+        if (error || !data) {
             return res.status(500).json({
                 error: "Could not generate download link"
             });

@@ -6,8 +6,8 @@ export const supabaseAdmin = createClient(
   { auth: { persistSession: false } }
 );
 
-const { data, error } = await supabaseAdmin.storage
-  .from(process.env.SUPABASE_STORAGE_BUCKET!)
-  .upload("test.txt", Buffer.from("hello world"));
+// const { data, error } = await supabaseAdmin.storage
+//   .from(process.env.SUPABASE_STORAGE_BUCKET!)
+//   .upload("test.txt", Buffer.from("hello world"));
 
-console.log(data, error);
+// console.log(data, error);
