@@ -2,32 +2,32 @@
 
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { uploadFileChunked } from "@/lib/chunkedUpload";
+import { getFileFingerprint, getUploadSession } from "@/lib/uploadSessionStore";
 
 export function FileDropzone() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
 
   const uploadFile = useCallback(async (file: File) => {
     setUploading(true);
+    setProgress(0);
     setMessage(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
+    // Check BEFORE starting the upload whether this file has a resumable session
+    const fingerprint = getFileFingerprint(file);
+    const existing = await getUploadSession(fingerprint);
+    if (existing) {
+      setMessage("Resuming previous upload...");
+    }
 
     try {
-      const res = await fetch("http://localhost:7000/files/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: formData,
+      const result = await uploadFileChunked(file, (percent) => {
+        setProgress(percent);
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-
-      setMessage(`Uploaded: ${data.file.name}`);
+      setMessage(`Uploaded: ${result.file.name}`);
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {
@@ -38,13 +38,14 @@ export function FileDropzone() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    if (uploading) return; // guard against double-submit, from the earlier 409 bug
     const file = e.dataTransfer.files[0];
     if (file) uploadFile(file);
   };
 
   return (
     <div
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+      onDragOver={(e) => { e.preventDefault(); if (!uploading) setIsDragging(true); }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
       className={`border-2 border-dashed rounded-lg p-10 text-center transition-colors ${
@@ -52,7 +53,7 @@ export function FileDropzone() {
       }`}
     >
       <p className="mb-4 text-sm text-muted-foreground">
-        {uploading ? "Uploading..." : "Drag and drop a file here, or"}
+        {uploading ? `Uploading... ${progress}%` : "Drag and drop a file here, or"}
       </p>
       <input
         type="file"
@@ -60,7 +61,7 @@ export function FileDropzone() {
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) uploadFile(file);
+          if (file && !uploading) uploadFile(file);
         }}
       />
       <Button
