@@ -9,6 +9,7 @@ import { requireAuth, requireRole } from "./middleware/auth.js";
 import filesRoutes from "./routes/files.js";
 import chunkedUploadRoutes from "./routes/chunkedUpload.js";
 import folderRoutes from "./routes/folders.js";
+import shareLinkRoutes from "./routes/shareLinks.js";
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use("/auth", authRoutes);
 app.use("/files", filesRoutes);
 app.use("/files", chunkedUploadRoutes);
 app.use("/folders", folderRoutes);
+app.use("/", shareLinkRoutes);
 
 app.get("/me", requireAuth, (req, res) => {
   res.json({user: req.user});
