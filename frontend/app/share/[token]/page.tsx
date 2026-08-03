@@ -13,7 +13,7 @@ export default function SharePage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`http://lacalhost:7000/share/${token}`)
+        fetch(`http://localhost:7000/share/${token}`)
             .then(async (res) => {
                 if (!res.ok) {
                     const data = await res.json();

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/auth.js";
-import { createLinkController, listFileLinkController, revokeController } from "../controller/sharLinksController.js";
+import { createLinkController, listFileLinkController, passwordDownloadLinkController, revokeController, shareLinkMetadate } from "../controller/sharLinksController.js";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 const router = Router();
 const passwordAttemptLimiter = rateLimit({
@@ -17,9 +17,9 @@ router.get("/files/:fileId/share", requireAuth, listFileLinkController);
 // revoke share link
 router.delete("/share/:id", requireAuth, revokeController);
 // public: get share link metadata (no auth required)
-router.get("/share/:token", passwordAttemptLimiter, );
+router.get("/share/:token", passwordAttemptLimiter, shareLinkMetadate);
 // public: verify password + get a download link
-router.post("/share/:token/download", passwordAttemptLimiter, );
+router.post("/share/:token/download", passwordAttemptLimiter, passwordDownloadLinkController);
 
 
 export default router;
