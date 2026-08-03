@@ -3,6 +3,7 @@ import path from "path";
 import { randomUUID, createHash } from "crypto";
 import { prisma } from "../db.js";
 import { supabaseAdmin } from "../supabase.js";
+import { thumbnailQueue } from "../queues/index.js";
 
 
 export const uploadFileController = async (req: Request, res: Response) => {
@@ -64,6 +65,12 @@ export const uploadFileController = async (req: Request, res: Response) => {
                 ownerId: req.user!.userId,
                 folderId: folderId || null,
             },
+        });
+
+        // successfull upload the queue for maintain losses
+        await thumbnailQueue.add("generate-thumbnail", {
+            fileId: file.id,
+            mimeType: file.mimeType,
         });
 
         res.status(201).json({ file });

@@ -1,6 +1,7 @@
 import { Redis } from "ioredis";
 
 export const redis = new Redis(process.env.REDIS_URL!, {
+    maxRetriesPerRequest: null, // required by BullMQ Workers
     retryStrategy(times) {
         if(times > 3) {
             console.error("Could not connect to Redis after 3 attempts. Is Docker running?");
