@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { uploadFileChunked } from "@/lib/chunkedUpload";
 import { getFileFingerprint, getUploadSession } from "@/lib/uploadSessionStore";
 
-export function FileDropzone() {
+type UploadDialogProps = {
+  folderId?: string;
+  onUploadComplete?: () => void;
+};
+
+export function FileDropzone({
+  folderId,
+  onUploadComplete,
+}: UploadDialogProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -14,9 +22,8 @@ export function FileDropzone() {
   const uploadFile = useCallback(async (file: File) => {
     setUploading(true);
     setProgress(0);
-    setMessage(null);
+    setMessage(null); 
 
-    // Check BEFORE starting the upload whether this file has a resumable session
     const fingerprint = getFileFingerprint(file);
     const existing = await getUploadSession(fingerprint);
     if (existing) {
@@ -24,10 +31,9 @@ export function FileDropzone() {
     }
 
     try {
-      const result = await uploadFileChunked(file, (percent) => {
-        setProgress(percent);
-      });
+      const result = await uploadFileChunked(file, (percent) => setProgress(percent), folderId);
       setMessage(`Uploaded: ${result.file.name}`);
+      onUploadComplete?.();
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {
@@ -48,9 +54,8 @@ export function FileDropzone() {
       onDragOver={(e) => { e.preventDefault(); if (!uploading) setIsDragging(true); }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
-      className={`border-2 border-dashed rounded-lg p-10 text-center transition-colors ${
-        isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/30"
-      }`}
+      className={`border-2 border-dashed rounded-lg p-10 text-center transition-colors ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/30"
+        }`}
     >
       <p className="mb-4 text-sm text-muted-foreground">
         {uploading ? `Uploading... ${progress}%` : "Drag and drop a file here, or"}
