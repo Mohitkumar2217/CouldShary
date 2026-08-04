@@ -6,7 +6,7 @@ export async function scheduleReapeatableJobs() {
         {
             every: 15 * 60 * 1000,
         },
-        {  
+        {
             name: "deactivate-expired-links",
             data: {},
         } // every 15 min
@@ -21,6 +21,17 @@ export async function scheduleReapeatableJobs() {
             name: "purge-soft-deleted-files",
             data: {},
         } // daily
+    );
+
+    await cleanupQueue.upsertJobScheduler(
+        "send-expiry-reminders",
+        {
+            every: 60 * 60 * 1000,
+        },
+        {
+            name: "send-expiry-reminders",
+            data: {},
+        } // hourly check
     );
 
     console.log("[queue] Repeatable jobs scheduled");

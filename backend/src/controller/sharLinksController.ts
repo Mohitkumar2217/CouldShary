@@ -3,6 +3,8 @@ import { prisma } from "../db.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
 import { nanoid } from "nanoid";
 import { supabaseAdmin } from "../supabase.js";
+import { shareNotificationEmail } from "../templates/emailTemplates.js";
+import { emailQueue } from "../queues/index.js";
 
 export const createLinkController = async (req: Request, res: Response) => {
     try {
@@ -39,6 +41,14 @@ export const createLinkController = async (req: Request, res: Response) => {
             },
         });
 
+        if(req.body.recipentEmail) {
+            const { subject, html } = shareNotificationEmail(file.name, `${process.env.FRONTEND_URL}/share/${shareLink.token}`);
+            await emailQueue.add("send-email", { 
+                to: req.body.recipentEmail,
+                subject, 
+                html
+            });
+        }
         return res.status(201).json({
             shareLink: {
                 ...shareLink,

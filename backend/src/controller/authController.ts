@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import { prisma } from "../db.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { verificationEmail } from "../templates/emailTemplates.js";
+import { emailQueue } from "../queues/index.js";
 
 export const registerController = async (req: Request, res: Response) => {
     try {
@@ -31,6 +33,13 @@ export const registerController = async (req: Request, res: Response) => {
                 passwordHash,
                 name,
             },
+        });
+
+        const { subject, html } = verificationEmail(user.name || "there", `${process.env.FRONTEND_URL}/verify?userId=${user.id}`);
+        await emailQueue.add('send-email', {
+            to: user.email,
+            subject,
+            html
         });
 
         const accessToken = signAccessToken({
@@ -78,8 +87,8 @@ export const loginController = async (req: Request, res: Response) => {
             });
         }
 
-        const user = await prisma.user.findUnique({ 
-            where: { email } 
+        const user = await prisma.user.findUnique({
+            where: { email }
         });
         if (!user || !(await verifyPassword(password, user.passwordHash))) {
             return res.status(401).json({
@@ -87,12 +96,12 @@ export const loginController = async (req: Request, res: Response) => {
             })
         }
 
-        const accessToken = signAccessToken({ 
-            userId: user.id, 
+        const accessToken = signAccessToken({
+            userId: user.id,
             role: user.role
         });
-        const refreshToken = signRefreshToken({ 
-            userId: user.id, 
+        const refreshToken = signRefreshToken({
+            userId: user.id,
             role: user.role
         });
 

@@ -25,7 +25,8 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
     "nanoid": "^6.0.0",
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "resend": "^6.18.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

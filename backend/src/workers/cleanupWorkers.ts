@@ -1,6 +1,8 @@
 import { Worker } from "bullmq";
 import { prisma } from "../db.js";
 import { redis } from "../redis.js";
+import { expiryReminderEmail } from "../templates/emailTemplates.js";
+import { emailQueue } from "../queues/index.js";
 
 export const cleanupWorker = new Worker(
     "cleanup",
@@ -29,7 +31,33 @@ export const cleanupWorker = new Worker(
                     console.log(`[cleanup] Would permanently purge file ${file.id} (${file.name})`);
                 }
             }
-        } catch(err) {
+
+            if (job.name === "send-expiry-reminders") {
+                const in24h = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                const soon = await prisma.shareLink.findMany({
+                    where: {
+                        expiresAt: { gt: new Date(), lt: in24h },
+                        revokedAt: null,
+                    },
+                    include: { file: true, createdBy: true },
+                });
+
+                for (const link of soon) {
+                    const hoursLeft = Math.round((link.expiresAt!.getTime() - Date.now()) / (60 * 60 * 1000));
+                    const { subject, html } = expiryReminderEmail(
+                        link.file.name,
+                        `${process.env.FRONTEND_URL}/share/${link.token}`,
+                        hoursLeft,
+                    );
+
+                    await emailQueue.add("send-email", {
+                        to: link.createdBy.email,
+                        subject,
+                        html,
+                    });
+                }
+            }
+        } catch (err) {
             console.log(err);
             throw err;
         }
