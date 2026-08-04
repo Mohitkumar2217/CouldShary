@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import "./workers/emailWorker.js";
 import "./workers/cleanupWorkers.js";
 import "./workers/thumbnailWorker.js";
