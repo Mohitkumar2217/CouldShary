@@ -24,19 +24,21 @@ enum Permission {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  name         String?
-  role         Role     @default(USER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  deletedAt    DateTime?
-
-  files        File[]
-  folders      Folder[]
-  shareLinks   ShareLink[]
-  accessGrants FileAccessGrant[]
+  id                     String   @id @default(uuid())
+  email                  String   @unique
+  passwordHash           String
+  name                   String?
+  role                   Role     @default(USER)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  deletedAt              DateTime?
+      
+  files                  File[]
+  folders                Folder[]
+  shareLinks             ShareLink[]
+  accessGrants           FileAccessGrant[]
+  resetPasswordTokenHash String? @unique
+  resetPasswordExpireAt  DateTime? 
 }
 
 model Folder {

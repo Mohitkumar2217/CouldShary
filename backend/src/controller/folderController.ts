@@ -323,7 +323,7 @@ export const deleteFolderController = async (req: Request, res: Response) => {
     }
 }
 
-async function softDeleteFolderRecursive(folderId: string, userId: string) {
+export async function softDeleteFolderRecursive(folderId: string, userId: string) {
     const now = new Date();
 
     // soft-delete all direct child folders(recursivly)
@@ -351,12 +351,18 @@ async function softDeleteFolderRecursive(folderId: string, userId: string) {
     });
 
     // soft-delete the folder itself
-    await prisma.folder.update({
+    // await prisma.folder.update({
+    //     where: {
+    //         id: folderId,
+    //     },
+    //     data: {
+    //         deletedAt: null,
+    //     }
+    // });
+    // soft-delete the folder itself
+    await prisma.folder.delete({
         where: {
             id: folderId,
-        },
-        data: {
-            deletedAt: null,
         }
     });
 }

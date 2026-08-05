@@ -22,7 +22,7 @@ export function ShareModal({ fileId, fileName }: { fileId: string, fileName: str
         setLoading(true);
         setError(null);
         try {
-            const data = await apiFetch(`files/${fileId}/share`, {
+            const data = await apiFetch(`/files/${fileId}/share`, {
                 method: "POST",
                 body: JSON.stringify({
                     visibility: "PUBLIC",
@@ -44,8 +44,10 @@ export function ShareModal({ fileId, fileName }: { fileId: string, fileName: str
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
-                <Button variant="outline" size="sm">Share</Button>
+            <DialogTrigger
+                render={<Button variant="outline" size="sm" />}
+            >
+                Share
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>

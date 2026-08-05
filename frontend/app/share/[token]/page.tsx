@@ -37,6 +37,7 @@ export default function SharePage() {
                     },
                     body: JSON.stringify({ password }),
                 }
+                
             );
 
             const data = await res.json();

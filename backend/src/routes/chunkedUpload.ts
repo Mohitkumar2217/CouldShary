@@ -4,7 +4,7 @@ import { requireAuth } from "../middleware/auth.js";
 import { chunkUploadController, completeUploadController, initializeController, statusController } from "../controller/uploadChunkedController.js";
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage()});
+const upload = multer({ storage: multer.memoryStorage() });
 
 // initialize an upload session
 router.post("/upload/init", requireAuth, initializeController);

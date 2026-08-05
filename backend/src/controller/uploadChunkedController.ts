@@ -29,7 +29,7 @@ export const initializeController = async (req: Request, res: Response) => {
         // create an empty temp file to append chunks into
         await fsPromises.writeFile(tempFilePath, "");
 
-        await redis.hset(`upload: ${uploadId}`, {
+        await redis.hset(`upload:${uploadId}`, {
             ownerId: req.user!.userId,
             filename,
             mimetype,
@@ -94,7 +94,7 @@ export const chunkUploadController = async (req: Request, res: Response) => {
 
 export const statusController = async (req: Request, res: Response) => {
     try {
-        const session = await redis.hgetall(`upload: ${req.params.uploadId}`);
+        const session = await redis.hgetall(`upload:${req.params.uploadId}`);
         if (!session.tempFilePath) {
             return res.status(404).json({
                 error: "Upload session not found or expired"
@@ -148,6 +148,11 @@ export const completeUploadController = async (req: Request, res: Response) => {
                 duplex: "half", // required by undici when passing a stream body
             } as any);
 
+        const fileBuffer = await readFile(session.tempFilePath);
+        const contentHash = createHash("sha256")
+            .update(fileBuffer)
+            .digest("hex");
+
         // Clean up temp file + Redis session regardless of outcome
         await fsPromises.unlink(session.tempFilePath).catch(() => { });
         await redis.del(`upload:${uploadId}`);
@@ -159,17 +164,11 @@ export const completeUploadController = async (req: Request, res: Response) => {
             });
         }
 
-        const fileBuffer = await readFile(session.tempFilePath);
-
-        const contentHash = createHash("sha256")
-            .update(fileBuffer)
-            .digest("hex");
-
         const file = await prisma.file.create({
             data: {
                 name: session.filename,
                 size: Number(session.size),
-                mimeType: session.mimeType,
+                mimeType: session.mimetype,
                 storageKey,
                 contentHash,
                 ownerId: req.user!.userId,

@@ -8,6 +8,7 @@ import { scheduleReapeatableJobs } from "./queues/scheduler.js";
 
 import express from "express";
 import cors from "cors";
+import helmet from "helmet"; 
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import { requireAuth, requireRole } from "./middleware/auth.js";
@@ -36,8 +37,14 @@ const app = express();
 
 // app.use("/admin/queues", serverAdapter.getRouter());
 
-app.use(express.json());
-app.use(cors());
+app.use(express.json()); 
+
+app.use(helmet());
+app.use(cors({
+  origin: process.env.FRONTEND_URL, // no wildcard — only your actual frontend
+  credentials: true,
+}));
+
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 

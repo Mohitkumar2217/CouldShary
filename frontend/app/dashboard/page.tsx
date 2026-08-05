@@ -1,10 +1,20 @@
 "use client";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+import { Input } from "@/components/ui/input";
+
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { apiFetch } from "@/lib/api";
-import { FileDropzone } from "@/components/FIleDropzone";
+import { FileDropzone } from "@/components/FileDropzone";
 import { ShareModal } from "@/components/ShareModal";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +26,8 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [folderName, setFolderName] = useState("");
+  const [open, setOpen] = useState(false);
   const [breadcrumbs, setBreadcrumbs] = useState<{ id: string; name: string }[]>([]);
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -46,12 +58,19 @@ export default function DashboardPage() {
   }, [user, currentFolderId, loadContents, router]);
 
   const createFolder = async () => {
-    const name = prompt("Folder name:");
-    if (!name) return;
+    if (!folderName.trim()) return;
+
     await apiFetch("/folders", {
       method: "POST",
-      body: JSON.stringify({ name, parentFolderId: currentFolderId }),
+      body: JSON.stringify({
+        name: folderName,
+        parentFolderId: currentFolderId,
+      }),
     });
+
+    setFolderName("");
+    setOpen(false);
+
     loadContents(currentFolderId);
   };
 
@@ -62,7 +81,12 @@ export default function DashboardPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold">My Files</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={createFolder}>New Folder</Button>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(true)}
+          >
+            New Folder
+          </Button>
           <Button variant="ghost" onClick={logout}>Log out</Button>
         </div>
       </div>
@@ -104,6 +128,34 @@ export default function DashboardPage() {
           )}
         </div>
       )}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Folder</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            placeholder="Folder name"
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                createFolder();
+              }
+            }}
+          />
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+
+            <Button onClick={createFolder}>
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

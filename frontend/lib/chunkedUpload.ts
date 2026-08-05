@@ -99,6 +99,13 @@ async function initUpload(file: File, totalChunks: number, folderId: string | un
       folderId,
     }),
   });
+
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
   const { uploadId } = await res.json();
+  console.log("Upload ID:", uploadId);
+
   return uploadId;
 }

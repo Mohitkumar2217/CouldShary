@@ -1,6 +1,6 @@
 export function verificationEmail(name: string, verifyUrl: string) {
     return {
-        subject: "Vwirfy your email",
+        subject: "Verify your email",
         html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
             <h2>Welcome, ${name}!</h2>
