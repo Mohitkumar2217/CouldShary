@@ -12,10 +12,21 @@ import { prisma } from "../db.js";
 const TEMP_DIR = path.join(process.cwd(), "tmp-uploads");
 fs.mkdirSync(TEMP_DIR, { recursive: true });
 
+const ALLOWED_MIME_TYPES = [
+    "image/jpeg", "image/png", "image/gif", "image/webp",
+    "application/pdf",
+    "text/plain", "text/csv",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/zip",
+    "video/mp4", "video/quicktime",
+    // add more as needed for your use case
+];
 
 export const initializeController = async (req: Request, res: Response) => {
     try {
         const { filename, mimetype, size, totalChunks, folderId } = req.body;
+
 
         if (!filename || !mimetype || !size || !totalChunks) {
             return res.status(400).json({
@@ -23,10 +34,15 @@ export const initializeController = async (req: Request, res: Response) => {
             });
         }
 
+        if (!ALLOWED_MIME_TYPES.includes(mimetype)) {
+            return res.status(400).json({
+                error: "File type not allowed"
+            });
+        }
+
         const uploadId = nanoid();
         const tempFilePath = path.join(TEMP_DIR, uploadId);
-
-        // create an empty temp file to append chunks into
+ 
         await fsPromises.writeFile(tempFilePath, "");
 
         await redis.hset(`upload:${uploadId}`, {

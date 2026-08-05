@@ -14,8 +14,8 @@ const upload = multer({
 
 const uploadLimiter = rateLimit({
     windowMs: 60 * 100,
-    max:10, // 10 upploads per minute per IP
-});
+    max:20, // 10 upploads per minute per IP
+});  
 
 router.post("/upload", uploadLimiter, requireAuth, upload.single("file"), uploadFileController);
 router.get("/:id/download", requireAuth, downloadFileController);

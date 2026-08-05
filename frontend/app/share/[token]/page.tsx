@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { apiFetch } from "@/lib/api";
 
 export default function SharePage() {
     const { token } = useParams();
@@ -28,8 +29,8 @@ export default function SharePage() {
     const handleDownload = async () => {
         try {
             setError(null);
-            const res = await fetch(
-                `http://localhost:7000/share/${token}/download`,
+            const res = await apiFetch(
+                `/share/${token}/download`,
                 {
                     method: "POST",
                     headers: {
@@ -37,7 +38,7 @@ export default function SharePage() {
                     },
                     body: JSON.stringify({ password }),
                 }
-                
+
             );
 
             const data = await res.json();

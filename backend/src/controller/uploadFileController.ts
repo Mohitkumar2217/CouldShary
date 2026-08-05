@@ -5,9 +5,20 @@ import { prisma } from "../db.js";
 import { supabaseAdmin } from "../supabase.js";
 import { thumbnailQueue } from "../queues/index.js";
 
+const ALLOWED_MIME_TYPES = [
+    "image/jpeg", "image/png", "image/gif", "image/webp",
+    "application/pdf",
+    "text/plain", "text/csv",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/zip",
+    "video/mp4", "video/quicktime",
+    // will add more as needed for use case
+]; 
 
 export const uploadFileController = async (req: Request, res: Response) => {
     try {
+        
         if (!req.file) {
             return res.status(400).json({
                 error: "No file provided",
@@ -16,6 +27,12 @@ export const uploadFileController = async (req: Request, res: Response) => {
         const { originalname, mimetype, size, buffer } = req.file;
         const { folderId } = req.body;  // optional - null means root
         const contentHash = createHash("sha256").update(buffer).digest("hex");
+
+        if (!ALLOWED_MIME_TYPES.includes(mimetype)) {
+            return res.status(400).json({ 
+                error: "File type not allowed" 
+            });
+        }
 
         const existing = await prisma.file.findFirst({
             where: {

@@ -18,15 +18,21 @@ export const registerController = async (req: Request, res: Response) => {
         }
 
         const existing = await prisma.user.findUnique({
-            where: { 
+            where: {
                 email,
-                deletedAt:null,
-             },
+                deletedAt: null,
+            },
         });
 
         if (existing) {
             return res.status(409).json({
                 error: "Email already registered",
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({ 
+                error: "Password must be at least 8 characters" 
             });
         }
 
