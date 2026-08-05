@@ -32,10 +32,10 @@ export function FileDropzone({
 
     try {
       const result = await uploadFileChunked(file, (percent) => setProgress(percent), folderId);
-      setMessage(`Uploaded: ${result.file.name}`);
+      setMessage(`Uploaded:${result.file.name}`);
       onUploadComplete?.();
     } catch (err: any) {
-      setMessage(`Error: ${err.message}`);
+      setMessage(`Error:${err.message}`);
     } finally {
       setUploading(false);
     }
