@@ -23,7 +23,7 @@ interface FolderItem { id: string; name: string; }
 interface FileItem { id: string; name: string; size: number; mimeType: string; }
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const router = useRouter();
 
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -51,12 +51,13 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
+    if (isLoading) return;
     if (!user) {
       router.push("/login");
       return;
     }
     loadContents(currentFolderId);
-  }, [user, currentFolderId, loadContents, router]);
+  }, [isLoading, user, currentFolderId, loadContents, router]);
 
   const createFolder = async () => {
     if (!folderName.trim()) return;
@@ -75,7 +76,13 @@ export default function DashboardPage() {
     loadContents(currentFolderId);
   };
 
-  if (!user) return null;
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
