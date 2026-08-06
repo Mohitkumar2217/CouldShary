@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer"; 
 import { requireAuth } from "../middleware/auth.js";
-import { downloadFileController, uploadFileController } from "../controller/uploadFileController.js";
+import { downloadFileController, thumbnailController, uploadFileController } from "../controller/uploadFileController.js";
 import rateLimit from "express-rate-limit";
 
 const router = Router();
@@ -19,5 +19,6 @@ const uploadLimiter = rateLimit({
 
 router.post("/upload", uploadLimiter, requireAuth, upload.single("file"), uploadFileController);
 router.get("/:id/download", requireAuth, downloadFileController);
+router.get("/:id/thumbnail", requireAuth, thumbnailController);
 
 export default router;

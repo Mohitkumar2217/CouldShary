@@ -17,6 +17,11 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
+    "resetPasswordTokenHash" TEXT,
+    "resetPasswordExpireAt" TIMESTAMP(3),
+    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "emailVerificationTokenHash" TEXT,
+    "emailVerificationExpiresAt" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -41,8 +46,10 @@ CREATE TABLE "File" (
     "size" INTEGER NOT NULL,
     "mimeType" TEXT NOT NULL,
     "storageKey" TEXT NOT NULL,
+    "contentHash" VARCHAR(64) NOT NULL,
     "ownerId" TEXT NOT NULL,
     "folderId" TEXT,
+    "thumbnailKey" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -94,13 +101,19 @@ CREATE TABLE "AuditLog" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_resetPasswordTokenHash_key" ON "User"("resetPasswordTokenHash");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_emailVerificationTokenHash_key" ON "User"("emailVerificationTokenHash");
+
+-- CreateIndex
 CREATE INDEX "Folder_ownerId_idx" ON "Folder"("ownerId");
 
 -- CreateIndex
 CREATE INDEX "Folder_parentFolderId_idx" ON "Folder"("parentFolderId");
 
 -- CreateIndex
-CREATE INDEX "File_ownerId_idx" ON "File"("ownerId");
+CREATE INDEX "File_ownerId_contentHash_idx" ON "File"("ownerId", "contentHash");
 
 -- CreateIndex
 CREATE INDEX "File_folderId_idx" ON "File"("folderId");

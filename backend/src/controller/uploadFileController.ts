@@ -4,6 +4,7 @@ import { randomUUID, createHash } from "crypto";
 import { prisma } from "../db.js";
 import { supabaseAdmin } from "../supabase.js";
 import { thumbnailQueue } from "../queues/index.js";
+import { error } from "console";
 
 const ALLOWED_MIME_TYPES = [
     "image/jpeg", "image/png", "image/gif", "image/webp",
@@ -14,11 +15,11 @@ const ALLOWED_MIME_TYPES = [
     "application/zip",
     "video/mp4", "video/quicktime",
     // will add more as needed for use case
-]; 
+];
 
 export const uploadFileController = async (req: Request, res: Response) => {
     try {
-        
+
         if (!req.file) {
             return res.status(400).json({
                 error: "No file provided",
@@ -26,13 +27,14 @@ export const uploadFileController = async (req: Request, res: Response) => {
         }
         const { originalname, mimetype, size, buffer } = req.file;
         const { folderId } = req.body;  // optional - null means root
-        const contentHash = createHash("sha256").update(buffer).digest("hex");
 
         if (!ALLOWED_MIME_TYPES.includes(mimetype)) {
-            return res.status(400).json({ 
-                error: "File type not allowed" 
+            return res.status(400).json({
+                error: "File type not allowed"
             });
         }
+
+        const contentHash = createHash("sha256").update(buffer).digest("hex");
 
         const existing = await prisma.file.findFirst({
             where: {
@@ -43,9 +45,21 @@ export const uploadFileController = async (req: Request, res: Response) => {
         })
 
         if (existing) {
+            const file = await prisma.file.create({
+                data: {
+                    name: originalname,
+                    size,
+                    mimeType: mimetype,
+                    storageKey: existing.storageKey, // same underlying bytes, no re-upload
+                    contentHash,
+                    ownerId: req.user!.userId,
+                    folderId: folderId || null,
+                },
+            });
+
             return res.status(200).json({
-                file: existing,
-                message: "Identical file already exists - reused existing copy",
+                file,
+                deduplicated: true,
             });
         }
 
@@ -77,8 +91,8 @@ export const uploadFileController = async (req: Request, res: Response) => {
                 name: originalname,
                 size,
                 mimeType: mimetype,
-                contentHash,
                 storageKey,
+                contentHash,
                 ownerId: req.user!.userId,
                 folderId: folderId || null,
             },
@@ -88,9 +102,13 @@ export const uploadFileController = async (req: Request, res: Response) => {
         await thumbnailQueue.add("generate-thumbnail", {
             fileId: file.id,
             mimeType: file.mimeType,
+            storageKey,
         });
 
-        res.status(201).json({ file });
+        res.status(201).json({
+            file,
+            deduplicated: false,
+        });
     } catch (err) {
         console.log(err);
         return res.status(500).json({
@@ -146,5 +164,41 @@ export const downloadFileController = async (req: Request, res: Response) => {
         return res.status(500).json({
             error: "Internal Server error",
         })
+    }
+}
+
+export const thumbnailController = async (req: Request, res: Response) => {
+    try {
+        const file = await prisma.file.findUnique({
+            where: {
+                id: req.params.id as any,
+            }
+        });
+
+        if (!file || file.deletedAt) return res.status(404).json({
+            error: "File not found"
+        });
+        if (file.ownerId !== req.user?.userId) return res.status(403).json({
+            error: "Forbidden"
+        });
+        if (!file.thumbnailKey) return res.status(404).json({
+            error: "Thumbnail not yet availbale"
+        });
+
+        const { data, error } = await supabaseAdmin.storage
+            .from(process.env.SUPABASE_STORAGE_BUCKET!)
+            .createSignedUrl(file.thumbnailKey, 60 * 5);
+
+        if (error || !data) return res.status(500).json({
+            error: "Could not generate thumbnail"
+        });
+
+        return res.status(200).json({
+            url: data.signedUrl
+        });
+    } catch (err) {
+        return res.status(500).json({
+            error: "Internal Server Error"
+        });
     }
 }

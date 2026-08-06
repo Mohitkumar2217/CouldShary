@@ -6,6 +6,7 @@ import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 import { verificationEmail } from "../templates/emailTemplates.js";
 import { emailQueue } from "../queues/index.js";
 import { softDeleteFolderRecursive } from "./folderController.js";
+import { error } from "console";
 
 export const registerController = async (req: Request, res: Response) => {
     try {
@@ -46,7 +47,19 @@ export const registerController = async (req: Request, res: Response) => {
             },
         });
 
-        const { subject, html } = verificationEmail(user.name || "there", `${process.env.FRONTEND_URL}/verify?userId=${user.id}`);
+        const rawToken = crypto.randomBytes(32).toString("hex");
+        const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+        await prisma.user.update({
+            where: {id: user.id},
+            data: {
+                emailVerificationTokenHash: tokenHash,
+                emailVerificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+            },
+        });
+
+        const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${rawToken}`;
+        const { subject, html } = verificationEmail(user.name || "there", verifyUrl);
         await emailQueue.add('send-email', {
             to: user.email,
             subject,
@@ -70,13 +83,16 @@ export const registerController = async (req: Request, res: Response) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
+        // return res.status(201).json({
+        //     accessToken,
+        //     user: {
+        //         id: user.id,
+        //         email: user.email,
+        //         name: user.name,
+        //     },
+        // });
         return res.status(201).json({
-            accessToken,
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-            },
+            message: "Registered. Check your email to verify your account."
         });
     } catch (error) {
         console.error(error);
@@ -101,9 +117,17 @@ export const loginController = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique({
             where: { email }
         });
+
         if (!user || user.deletedAt || !(await verifyPassword(password, user.passwordHash))) {
             return res.status(401).json({
                 error: "Invalid Email or Password"
+            })
+        }
+
+        if(!user.verified) {
+            return res.status(403).json({
+                error: "Please verify your email before logging in.", 
+                unverified: true
             })
         }
 
@@ -311,6 +335,69 @@ export const deleteAccountController = async (req: Request, res: Response) => {
         console.log(err);
         return res.status(500).json({
             error: "Internal Server Error"
+        });
+    }
+}
+
+export const verifyEmailController = async (req: Request, res: Response) => {
+    const {token} = req.body;
+    if(!token) {
+        return res.status(400).json({
+            errpr: "Token required"
+        });
+    }
+
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const user = await prisma.user.findUnique({where: { emailVerificationTokenHash: tokenHash}});
+
+    if(!token || !user?.emailVerificationExpiresAt || user.emailVerificationExpiresAt < new Date()) {
+        return res.status(400).json({
+            error: "Invalid or expired verification link"
+        });
+    }
+    
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {
+            verified: true,
+            emailVerificationTokenHash: null,
+            emailVerificationExpiresAt: null,
+        }
+    });
+
+    return res.status(200).json({
+        message: "Email verified. You can now log in."
+    });
+}
+
+export const resendVerificationController = async (req: Request, res: Response) => {
+    try {
+        const {email } = req.body;
+        const user = await prisma.user.findUnique({where: {email}});
+
+        const generic = {message: "If that acccount exists and its unverified, a new email has been sent."};
+        if(!user || user?.verified || user?.deletedAt) {
+            return res.status(200).json(generic);
+        } 
+
+        const rawToken = crypto.randomBytes(32).toString("hex");
+        const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+        await prisma.user.update({
+            where: {id: user.id},
+            data: { emailVerificationTokenHash: tokenHash, emailVerificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)},
+        });
+
+        const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${rawToken}`;
+        const { subject, html} = verificationEmail(user.email || "there", verifyUrl);
+        await emailQueue.add("send-email", {to: user.email, subject, html});
+
+        return res.status(200).json({
+            generic
+        });
+    } catch(err) {
+        return res.status(500).json({
+            error:"Internal Server Error"
         });
     }
 }

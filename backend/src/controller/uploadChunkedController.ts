@@ -135,21 +135,45 @@ export const completeUploadController = async (req: Request, res: Response) => {
         const session = await redis.hgetall(`upload:${uploadId}`);
 
         if (!session.tempFilePath) {
-            return res.status(404).json({
-                error: "Upload session not found or expired"
-            });
+            return res.status(404).json({ error: "Upload session not found or expired" });
         }
         if (session.ownerId !== req.user!.userId) {
-            return res.status(403).json({
-                error: "FOrbidden"
-            });
+            return res.status(403).json({ error: "Forbidden" });
         }
         if (Number(session.receivedChunks) !== Number(session.totalChunks)) {
             return res.status(400).json({
                 error: "Not all chunks received",
                 receivedChunks: session.receivedChunks,
-                totalChunk: session.totalChunks,
+                totalChunks: session.totalChunks,
             });
+        }
+
+        // Compute the hash FIRST, before deciding whether to upload at all
+        const fileBuffer = await readFile(session.tempFilePath);
+        const contentHash = createHash("sha256").update(fileBuffer).digest("hex");
+
+        const existing = await prisma.file.findFirst({
+            where: { ownerId: req.user!.userId, contentHash, deletedAt: null },
+        });
+
+        if (existing) {
+            // Skip the Supabase upload entirely — reuse the existing storage object
+            await fsPromises.unlink(session.tempFilePath).catch(() => {});
+            await redis.del(`upload:${uploadId}`);
+
+            const file = await prisma.file.create({
+                data: {
+                    name: session.filename,
+                    size: Number(session.size),
+                    mimeType: session.mimetype,
+                    storageKey: existing.storageKey, // same bytes, no re-upload
+                    contentHash,
+                    ownerId: req.user!.userId,
+                    folderId: session.folderId || null,
+                },
+            });
+
+            return res.status(200).json({ file, deduplicated: true });
         }
 
         const ext = path.extname(session.filename);
@@ -160,23 +184,17 @@ export const completeUploadController = async (req: Request, res: Response) => {
         const { error: uploadError } = await supabaseAdmin.storage
             .from(process.env.SUPABASE_STORAGE_BUCKET!)
             .upload(storageKey, fileStream, {
-                mimeType: session.mimetype,
-                duplex: "half", // required by undici when passing a stream body
+                contentType: session.mimetype, // fixed: was `mimeType`
+                duplex: "half",
             } as any);
 
-        const fileBuffer = await readFile(session.tempFilePath);
-        const contentHash = createHash("sha256")
-            .update(fileBuffer)
-            .digest("hex");
-
-        // Clean up temp file + Redis session regardless of outcome
-        await fsPromises.unlink(session.tempFilePath).catch(() => { });
+        await fsPromises.unlink(session.tempFilePath).catch(() => {});
         await redis.del(`upload:${uploadId}`);
 
         if (uploadError) {
             return res.status(500).json({
                 error: "Upload to storage failed",
-                details: uploadError.message
+                details: uploadError.message,
             });
         }
 
@@ -192,13 +210,9 @@ export const completeUploadController = async (req: Request, res: Response) => {
             },
         });
 
-        return res.status(201).json({
-            file
-        });
+        return res.status(201).json({ file, deduplicated: false });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({
-            error: "Internal Server Error"
-        });
+        return res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};

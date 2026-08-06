@@ -24,21 +24,24 @@ enum Permission {
 }
 
 model User {
-  id                     String   @id @default(uuid())
-  email                  String   @unique
-  passwordHash           String
-  name                   String?
-  role                   Role     @default(USER)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-  deletedAt              DateTime?
-      
-  files                  File[]
-  folders                Folder[]
-  shareLinks             ShareLink[]
-  accessGrants           FileAccessGrant[]
-  resetPasswordTokenHash String? @unique
-  resetPasswordExpireAt  DateTime? 
+  id                         String   @id @default(uuid())
+  email                      String   @unique
+  passwordHash               String
+  name                       String?
+  role                       Role     @default(USER)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  deletedAt                  DateTime?
+          
+  files                      File[]
+  folders                    Folder[]
+  shareLinks                 ShareLink[]
+  accessGrants               FileAccessGrant[]
+  resetPasswordTokenHash     String? @unique
+  resetPasswordExpireAt      DateTime? 
+  verified                   Boolean   @default(false)
+  emailVerificationTokenHash String?   @unique
+  emailVerificationExpiresAt DateTime?
 }
 
 model Folder {
@@ -59,24 +62,25 @@ model Folder {
 }
 
 model File {
-  id          String    @id @default(uuid())
-  name        String
-  size        Int
-  mimeType    String
-  storageKey  String    // path/key inside the Supabase bucket
-  contentHash String    @db.VarChar(64)
-  ownerId     String
-  owner       User      @relation(fields: [ownerId], references: [id])
-  folderId    String?
-  folder      Folder?   @relation(fields: [folderId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id            String    @id @default(uuid())
+  name          String
+  size          Int
+  mimeType      String
+  storageKey    String    // path/key inside the Supabase bucket
+  contentHash   String    @db.VarChar(64)
+  ownerId       String
+  owner         User      @relation(fields: [ownerId], references: [id])
+  folderId      String?
+  thumbnailKey  String?
+  folder        Folder?   @relation(fields: [folderId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
 
   shareLinks    ShareLink[]
-  accessGrants  FileAccessGrant[]
+  accessGrants  FileAccessGrant[] 
 
-  @@index([ownerId])
+  @@index([ownerId, contentHash])
   @@index([folderId])
 }
 
