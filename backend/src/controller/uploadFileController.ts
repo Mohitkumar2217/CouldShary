@@ -136,12 +136,14 @@ export const downloadFileController = async (req: Request, res: Response) => {
                 error: "File not found",
             });
         }
+        const hasAccess =
+            file.ownerId === req.user!.userId ||
+            (await prisma.fileAccessGrant.findUnique({
+                where: { fileId_userId: { fileId: file.id, userId: req.user!.userId } },
+            }));
 
-        // ownership check - the core of Phase - 11's, worth doing now
-        if (file.ownerId !== req.user!.userId) {
-            return res.status(403).json({
-                error: "Forbidden",
-            });
+        if (!hasAccess) {
+            return res.status(403).json({ error: "Forbidden" });
         }
 
         const { data, error } = await supabaseAdmin.storage

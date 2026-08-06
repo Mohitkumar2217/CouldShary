@@ -17,6 +17,7 @@ import { apiFetch } from "@/lib/api";
 import { FileDropzone } from "@/components/FileDropzone";
 import { ShareModal } from "@/components/ShareModal";
 import { Button } from "@/components/ui/button";
+import { CreateFolderDialog } from "@/components/CreateFolderDialog";
 
 interface FolderItem { id: string; name: string; }
 interface FileItem { id: string; name: string; size: number; mimeType: string; }
@@ -81,12 +82,7 @@ export default function DashboardPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold">My Files</h1>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setOpen(true)}
-          >
-            New Folder
-          </Button>
+          <CreateFolderDialog parentFolderId={currentFolderId} onCreated={() => loadContents(currentFolderId)} />
           <Button variant="ghost" onClick={logout}>Log out</Button>
         </div>
       </div>

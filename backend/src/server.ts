@@ -16,6 +16,7 @@ import filesRoutes from "./routes/files.js";
 import chunkedUploadRoutes from "./routes/chunkedUpload.js";
 import folderRoutes from "./routes/folders.js";
 import shareLinkRoutes from "./routes/shareLinks.js";
+import fileAccessRoutes from "./routes/fileAccess.js";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/files", filesRoutes);
 app.use("/files", chunkedUploadRoutes);
 app.use("/folders", folderRoutes);
 app.use("/", shareLinkRoutes);
+app.use("/", fileAccessRoutes);
 
 app.get("/me", requireAuth, (req, res) => {
   res.json({user: req.user});
