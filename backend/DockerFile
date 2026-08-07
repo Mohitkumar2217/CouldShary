@@ -1,0 +1,8 @@
+FROM node:20-alpine
+WORKDIR /src
+COPY package*.json ./
+RUN npm run dev
+COPY . .
+RUN npx prisma generate
+EXPOSE 4000
+CMD ["node", "dist/server.js"]
