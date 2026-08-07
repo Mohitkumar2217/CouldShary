@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { apiFetch } from "@/lib/api";
+
+const API_BASE = "http://localhost:7000";
 
 export default function SharePage() {
   const { token } = useParams();
@@ -15,7 +16,12 @@ export default function SharePage() {
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    apiFetch(`/share/${token}`)
+    fetch(`${API_BASE}/share/${token}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        return data;
+      })
       .then(setMeta)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -25,13 +31,16 @@ export default function SharePage() {
     setError(null);
     setDownloading(true);
     try {
-      const data = await apiFetch(`/share/${token}/download`, {
+      const res = await fetch(`${API_BASE}/share/${token}/download`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error); // "Incorrect password" now shows correctly
       window.location.href = data.url;
     } catch (err: any) {
-      setError(err.message); // now shown inline, not crashed to console
+      setError(err.message);
     } finally {
       setDownloading(false);
     }

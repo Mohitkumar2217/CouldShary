@@ -41,10 +41,10 @@ export const createLinkController = async (req: Request, res: Response) => {
             },
         });
 
-        if(req.body.recipentEmail) {
+        if(req.body.recipientEmail) {
             const { subject, html } = shareNotificationEmail(file.name, `${process.env.FRONTEND_URL}/share/${shareLink.token}`);
             await emailQueue.add("send-email", { 
-                to: req.body.recipentEmail,
+                to: req.body.recipientEmail,
                 subject, 
                 html
             });
@@ -85,7 +85,7 @@ export const listFileLinkController = async (req: Request, res: Response) => {
             }
         });
 
-        return res.status(201).json({
+        return res.status(200).json({
             shareLinks: links.map((l) => ({
                 ...l,
                 passwordHash: undefined
@@ -176,9 +176,9 @@ export const shareLinkMetadate = async (req: Request, res: Response) => {
                 name: link.file.name,
                 size: link.file.size,
                 mimeType: link.file.mimeType,
-                requiresPassword: !!link.passwordHash,
-                visibility: link.visibility
-            }
+            },
+            requiresPassword: !!link.passwordHash,   
+            visibility: link.visibility,             
         });
     } catch (err) {
         console.log(err);
@@ -243,7 +243,7 @@ export const passwordDownloadLinkController = async (req: Request, res: Response
             });
         }
 
-        prisma.shareLink.update({
+        await prisma.shareLink.update({
             where: {
                 id: link.id,
             },

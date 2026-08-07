@@ -30,6 +30,7 @@ export async function apiFetch(path: string, options: RequestInit = {}, _retried
     const token = localStorage.getItem("accessToken");
     const res = await fetch(`${API_BASE}${path}`, {
         ...options,
+        credentials: "include",   // ← was missing, add this back
         headers: {
             ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
