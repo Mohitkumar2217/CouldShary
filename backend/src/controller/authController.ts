@@ -32,8 +32,8 @@ export const registerController = async (req: Request, res: Response) => {
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ 
-                error: "Password must be at least 8 characters" 
+            return res.status(400).json({
+                error: "Password must be at least 8 characters"
             });
         }
 
@@ -51,7 +51,7 @@ export const registerController = async (req: Request, res: Response) => {
         const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
         await prisma.user.update({
-            where: {id: user.id},
+            where: { id: user.id },
             data: {
                 emailVerificationTokenHash: tokenHash,
                 emailVerificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
@@ -124,9 +124,15 @@ export const loginController = async (req: Request, res: Response) => {
             })
         }
 
-        if(!user.verified) {
+        if (user.suspended) {
             return res.status(403).json({
-                error: "Please verify your email before logging in.", 
+                error: "Your account has been suspended. Contact support for assistance."
+            });
+        }
+
+        if (!user.verified) {
+            return res.status(403).json({
+                error: "Please verify your email before logging in.",
                 unverified: true
             })
         }
@@ -153,6 +159,7 @@ export const loginController = async (req: Request, res: Response) => {
                 id: user.id,
                 email: user.email,
                 name: user.name,
+                role: user.role,
             }
         });
     } catch (err) {
@@ -340,24 +347,24 @@ export const deleteAccountController = async (req: Request, res: Response) => {
 }
 
 export const verifyEmailController = async (req: Request, res: Response) => {
-    const {token} = req.body;
-    if(!token) {
+    const { token } = req.body;
+    if (!token) {
         return res.status(400).json({
             errpr: "Token required"
         });
     }
 
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-    const user = await prisma.user.findUnique({where: { emailVerificationTokenHash: tokenHash}});
+    const user = await prisma.user.findUnique({ where: { emailVerificationTokenHash: tokenHash } });
 
-    if(!token || !user?.emailVerificationExpiresAt || user.emailVerificationExpiresAt < new Date()) {
+    if (!token || !user?.emailVerificationExpiresAt || user.emailVerificationExpiresAt < new Date()) {
         return res.status(400).json({
             error: "Invalid or expired verification link"
         });
     }
-    
+
     await prisma.user.update({
-        where: {id: user.id},
+        where: { id: user.id },
         data: {
             verified: true,
             emailVerificationTokenHash: null,
@@ -372,57 +379,57 @@ export const verifyEmailController = async (req: Request, res: Response) => {
 
 export const resendVerificationController = async (req: Request, res: Response) => {
     try {
-        const {email } = req.body;
-        const user = await prisma.user.findUnique({where: {email}});
+        const { email } = req.body;
+        const user = await prisma.user.findUnique({ where: { email } });
 
-        const generic = {message: "If that acccount exists and its unverified, a new email has been sent."};
-        if(!user || user?.verified || user?.deletedAt) {
+        const generic = { message: "If that acccount exists and its unverified, a new email has been sent." };
+        if (!user || user?.verified || user?.deletedAt) {
             return res.status(200).json(generic);
-        } 
+        }
 
         const rawToken = crypto.randomBytes(32).toString("hex");
         const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
         await prisma.user.update({
-            where: {id: user.id},
-            data: { emailVerificationTokenHash: tokenHash, emailVerificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)},
+            where: { id: user.id },
+            data: { emailVerificationTokenHash: tokenHash, emailVerificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) },
         });
 
         const verifyUrl = `${process.env.FRONTEND_URL}/verify-email/${rawToken}`;
-        const { subject, html} = verificationEmail(user.email || "there", verifyUrl);
-        await emailQueue.add("send-email", {to: user.email, subject, html});
+        const { subject, html } = verificationEmail(user.email || "there", verifyUrl);
+        await emailQueue.add("send-email", { to: user.email, subject, html });
 
         return res.status(200).json({
             generic
         });
-    } catch(err) {
+    } catch (err) {
         return res.status(500).json({
-            error:"Internal Server Error"
+            error: "Internal Server Error"
         });
     }
 }
 
-export const refreshTokenController = async (req:Request, res: Response) => {
+export const refreshTokenController = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) return res.status(401).json({ error: "No refresh token" });
+    if (!refreshToken) return res.status(401).json({ error: "No refresh token" });
 
-  try {
-    const payload = verifyRefreshToken(refreshToken);
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
-    if (!user || user.deletedAt) return res.status(401).json({ error: "Invalid session" });
+    try {
+        const payload = verifyRefreshToken(refreshToken);
+        const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+        if (!user || user.deletedAt) return res.status(401).json({ error: "Invalid session" });
 
-    const accessToken = signAccessToken({ userId: user.id, role: user.role });
-    const newRefreshToken = signRefreshToken({ userId: user.id, role: user.role }); // rotate it
+        const accessToken = signAccessToken({ userId: user.id, role: user.role });
+        const newRefreshToken = signRefreshToken({ userId: user.id, role: user.role }); // rotate it
 
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
-    res.json({ accessToken });
-  } catch {
-    res.status(401).json({ error: "Invalid or expired refresh token" });
-  }
+        res.json({ accessToken });
+    } catch {
+        res.status(401).json({ error: "Invalid or expired refresh token" });
+    }
 }

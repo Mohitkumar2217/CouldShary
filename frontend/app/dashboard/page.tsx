@@ -9,6 +9,7 @@ import { ShareModal } from "@/components/ShareModal";
 import { FileRowActions } from "@/components/FileRowActions";
 import { CreateFolderDialog } from "@/components/CreateFolderDialog";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface FolderItem { id: string; name: string; }
 interface FileItem { id: string; name: string; size: number; mimeType: string; }
@@ -100,6 +101,9 @@ export default function DashboardPage() {
         <h1 className="text-xl font-semibold">My Files</h1>
         <div className="flex gap-2">
           <CreateFolderDialog parentFolderId={currentFolderId} onCreated={() => loadContents(currentFolderId)} />
+          {user.role === "ADMIN" && (
+            <Link href="/admin/users"><Button variant="outline">Admin</Button></Link>
+          )}
           <Button variant="ghost" onClick={logout}>Log out</Button>
         </div>
       </div>
@@ -135,9 +139,8 @@ export default function DashboardPage() {
               onDragOver={(e) => { e.preventDefault(); setDragOverFolderId(folder.id); }}
               onDragLeave={() => setDragOverFolderId(null)}
               onDrop={(e) => handleFolderDrop(e, folder.id)}
-              className={`flex justify-between items-center p-3 border rounded-md hover:bg-accent cursor-pointer transition-colors ${
-                dragOverFolderId === folder.id ? "bg-primary/10 ring-2 ring-primary" : ""
-              }`}
+              className={`flex justify-between items-center p-3 border rounded-md hover:bg-accent cursor-pointer transition-colors ${dragOverFolderId === folder.id ? "bg-primary/10 ring-2 ring-primary" : ""
+                }`}
             >
               <span>📁 {folder.name}</span>
             </div>

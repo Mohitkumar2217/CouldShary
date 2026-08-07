@@ -32,6 +32,7 @@ model User {
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
   deletedAt                  DateTime?
+  suspended                  Boolean @default(false)
           
   files                      File[]
   folders                    Folder[]
