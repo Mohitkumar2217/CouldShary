@@ -19,10 +19,12 @@ export function FileDropzone({
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
 
+  console.log("Current folder:", folderId);
+
   const uploadFile = useCallback(async (file: File) => {
     setUploading(true);
     setProgress(0);
-    setMessage(null); 
+    setMessage(null);
 
     const fingerprint = getFileFingerprint(file);
     const existing = await getUploadSession(fingerprint);
@@ -39,7 +41,7 @@ export function FileDropzone({
     } finally {
       setUploading(false);
     }
-  }, []);
+  }, [folderId, onUploadComplete]);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();

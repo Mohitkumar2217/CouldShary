@@ -7,7 +7,8 @@ import {
     resetPaaawordController,
     deleteAccountController,
     verifyEmailController,
-    resendVerificationController
+    resendVerificationController,
+    refreshTokenController
 } from "../controller/authController.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -32,5 +33,6 @@ router.post("/reset-password", authLimiter, resetPaaawordController);
 router.delete("/account", requireAuth, deleteAccountController);
 router.post("/verify-email", verifyEmailController);
 router.post("/resend-verification", authLimiter, resendVerificationController);
+router.post("/refresh", refreshTokenController);
 
 export default router;

@@ -39,12 +39,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stored = localStorage.getItem("accessToken");
         const storedUser = localStorage.getItem("user");
         if (stored && storedUser) {
-            setAccessToken(stored);
-            setUser(JSON.parse(storedUser));
+            try {
+                setAccessToken(stored);
+                setUser(JSON.parse(storedUser));
+            } catch {
+                // Corrupted data (e.g. from a past bug) — clear it and fall back to logged-out state
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("user");
+            }
         }
     }, []);
 
     const login = (token: string, u: User) => {
+        if (!token || !u) {
+            console.error("login() called with invalid token or user:", { token, u });
+            return; // refuse to write bad data
+        }
         localStorage.setItem("accessToken", token);
         localStorage.setItem("user", JSON.stringify(u));
         setAccessToken(token);

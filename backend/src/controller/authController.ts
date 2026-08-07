@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import crypto from "crypto";
 import { prisma } from "../db.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
-import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
 import { verificationEmail } from "../templates/emailTemplates.js";
 import { emailQueue } from "../queues/index.js";
 import { softDeleteFolderRecursive } from "./folderController.js";
@@ -400,4 +400,29 @@ export const resendVerificationController = async (req: Request, res: Response) 
             error:"Internal Server Error"
         });
     }
+}
+
+export const refreshTokenController = async (req:Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.status(401).json({ error: "No refresh token" });
+
+  try {
+    const payload = verifyRefreshToken(refreshToken);
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user || user.deletedAt) return res.status(401).json({ error: "Invalid session" });
+
+    const accessToken = signAccessToken({ userId: user.id, role: user.role });
+    const newRefreshToken = signRefreshToken({ userId: user.id, role: user.role }); // rotate it
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ accessToken });
+  } catch {
+    res.status(401).json({ error: "Invalid or expired refresh token" });
+  }
 }
