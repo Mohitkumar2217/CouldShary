@@ -1,23 +1,14 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-
-import { Input } from "@/components/ui/input";
-
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { apiFetch } from "@/lib/api";
 import { FileDropzone } from "@/components/FileDropzone";
 import { ShareModal } from "@/components/ShareModal";
-import { Button } from "@/components/ui/button";
+import { FileRowActions } from "@/components/FileRowActions";
 import { CreateFolderDialog } from "@/components/CreateFolderDialog";
+import { Button } from "@/components/ui/button";
 
 interface FolderItem { id: string; name: string; }
 interface FileItem { id: string; name: string; size: number; mimeType: string; }
@@ -25,14 +16,15 @@ interface FileItem { id: string; name: string; size: number; mimeType: string; }
 export default function DashboardPage() {
   const { user, logout, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentFolderId = searchParams.get("folder"); // URL is the source of truth now
 
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [folderName, setFolderName] = useState("");
-  const [open, setOpen] = useState(false);
   const [breadcrumbs, setBreadcrumbs] = useState<{ id: string; name: string }[]>([]);
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+  const [dragOverRoot, setDragOverRoot] = useState(false);
 
   const loadContents = useCallback(async (folderId: string | null) => {
     setLoading(true);
@@ -40,7 +32,6 @@ export default function DashboardPage() {
     const data = await apiFetch(`/folders${query}`);
     setFolders(data.folders);
     setFiles(data.files);
-
     if (folderId) {
       const bc = await apiFetch(`/folders/${folderId}/breadcrumbs`);
       setBreadcrumbs(bc.breadcrumbs);
@@ -59,21 +50,40 @@ export default function DashboardPage() {
     loadContents(currentFolderId);
   }, [isLoading, user, currentFolderId, loadContents, router]);
 
-  const createFolder = async () => {
-    if (!folderName.trim()) return;
+  const navigateToFolder = (folderId: string | null) => {
+    router.push(folderId ? `/dashboard?folder=${folderId}` : "/dashboard");
+  };
 
-    await apiFetch("/folders", {
-      method: "POST",
-      body: JSON.stringify({
-        name: folderName,
-        parentFolderId: currentFolderId,
-      }),
-    });
+  // --- Drag and drop: moving an existing file onto a folder ---
+  const handleFileDragStart = (e: React.DragEvent, fileId: string) => {
+    e.dataTransfer.setData("text/plain", fileId);
+    e.dataTransfer.effectAllowed = "move";
+  };
 
-    setFolderName("");
-    setOpen(false);
+  const moveFile = async (fileId: string, newFolderId: string | null) => {
+    try {
+      await apiFetch(`/folders/files/${fileId}/move`, {
+        method: "PATCH",
+        body: JSON.stringify({ newFolderId }),
+      });
+      loadContents(currentFolderId);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
-    loadContents(currentFolderId);
+  const handleFolderDrop = (e: React.DragEvent, folderId: string) => {
+    e.preventDefault();
+    setDragOverFolderId(null);
+    const fileId = e.dataTransfer.getData("text/plain");
+    if (fileId) moveFile(fileId, folderId);
+  };
+
+  const handleRootDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOverRoot(false);
+    const fileId = e.dataTransfer.getData("text/plain");
+    if (fileId) moveFile(fileId, null);
   };
 
   if (isLoading) {
@@ -94,13 +104,20 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Breadcrumbs */}
       <div className="flex gap-2 text-sm text-muted-foreground mb-4">
-        <button onClick={() => setCurrentFolderId(null)} className="hover:underline">Root</button>
+        <button
+          onClick={() => navigateToFolder(null)}
+          onDragOver={(e) => { e.preventDefault(); setDragOverRoot(true); }}
+          onDragLeave={() => setDragOverRoot(false)}
+          onDrop={handleRootDrop}
+          className={`hover:underline px-1 rounded ${dragOverRoot ? "bg-primary/10 ring-1 ring-primary" : ""}`}
+        >
+          Root
+        </button>
         {breadcrumbs.map((b) => (
           <span key={b.id}>
             {" / "}
-            <button onClick={() => setCurrentFolderId(b.id)} className="hover:underline">{b.name}</button>
+            <button onClick={() => navigateToFolder(b.id)} className="hover:underline">{b.name}</button>
           </span>
         ))}
       </div>
@@ -114,16 +131,29 @@ export default function DashboardPage() {
           {folders.map((folder) => (
             <div
               key={folder.id}
-              className="flex justify-between items-center p-3 border rounded-md hover:bg-accent cursor-pointer"
-              onClick={() => setCurrentFolderId(folder.id)}
+              onClick={() => navigateToFolder(folder.id)}
+              onDragOver={(e) => { e.preventDefault(); setDragOverFolderId(folder.id); }}
+              onDragLeave={() => setDragOverFolderId(null)}
+              onDrop={(e) => handleFolderDrop(e, folder.id)}
+              className={`flex justify-between items-center p-3 border rounded-md hover:bg-accent cursor-pointer transition-colors ${
+                dragOverFolderId === folder.id ? "bg-primary/10 ring-2 ring-primary" : ""
+              }`}
             >
               <span>📁 {folder.name}</span>
             </div>
           ))}
           {files.map((file) => (
-            <div key={file.id} className="flex justify-between items-center p-3 border rounded-md">
+            <div
+              key={file.id}
+              draggable
+              onDragStart={(e) => handleFileDragStart(e, file.id)}
+              className="flex justify-between items-center p-3 border rounded-md cursor-grab active:cursor-grabbing"
+            >
               <span>📄 {file.name} <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span></span>
-              <ShareModal fileId={file.id} fileName={file.name} />
+              <div className="flex gap-2">
+                <ShareModal fileId={file.id} fileName={file.name} />
+                <FileRowActions fileId={file.id} currentFolderId={currentFolderId} onChanged={() => loadContents(currentFolderId)} />
+              </div>
             </div>
           ))}
           {folders.length === 0 && files.length === 0 && (
@@ -131,34 +161,6 @@ export default function DashboardPage() {
           )}
         </div>
       )}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Folder</DialogTitle>
-          </DialogHeader>
-
-          <Input
-            placeholder="Folder name"
-            value={folderName}
-            onChange={(e) => setFolderName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                createFolder();
-              }
-            }}
-          />
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-
-            <Button onClick={createFolder}>
-              Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

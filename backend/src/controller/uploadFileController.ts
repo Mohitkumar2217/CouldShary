@@ -204,3 +204,41 @@ export const thumbnailController = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const deleteFileController = async (req: Request, res: Response) => {
+    try {
+        const fileId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const file = await prisma.file.findUnique({
+            where: {id: fileId}
+        });
+
+        if(!file || file.deletedAt) {
+            return res.status(404).json({
+                error: "File not found"
+            });
+        }
+        if(file.ownerId !== req.user?.userId) {
+            return res.status(403).json({
+                error: "Forbidden"
+            });
+        }
+
+        await prisma.file.update({
+            where: {id: fileId},
+            data: {deletedAt: new Date()}
+        });
+
+        await prisma.shareLink.updateMany({
+            where: { fileId: fileId, revokedAt: null},
+            data: {revokedAt: new Date()}
+        });
+
+        return res.status(200).json({
+            message: "File deleted"
+        });
+    } catch(err) {
+        return res.status(500).json({
+            error: "Internal Server Error"
+        });
+    }
+}
