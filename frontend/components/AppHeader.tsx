@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { Button } from "@/components/ui/button";
+import { GithubStarButton } from "@/components/GithubStarButton";
 
 export function AppHeader() {
   const { user, logout } = useAuth();
@@ -23,11 +24,12 @@ export function AppHeader() {
   return (
     <header className="border-b mb-6">
       <div className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
-        <Link href="/dashboard" className="font-semibold">SecureShare</Link>
+        <Link href="/dashboard" className="font-semibold">CloudShary</Link>
         <nav className="flex items-center gap-4">
           {navLink("/dashboard", "Dashboard")}
           {navLink("/settings", "Settings")}
           {user.role === "ADMIN" && navLink("/admin/users", "Admin")}
+          <GithubStarButton />
           <Button variant="ghost" size="sm" onClick={logout}>Log out</Button>
         </nav>
       </div>

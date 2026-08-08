@@ -13,6 +13,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { FilePreviewDialog } from "@/components/FilePreviewDialog";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
+import { AppHeader } from "@/components/AppHeader";
 
 interface FolderItem { id: string; name: string; }
 interface FileItem { id: string; name: string; size: number; mimeType: string; }
@@ -102,87 +103,84 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-semibold">My Files</h1>
-        <div className="flex gap-2">
+    <>
+      <AppHeader />
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-xl font-semibold">My Files</h1>
           <CreateFolderDialog parentFolderId={currentFolderId} onCreated={() => loadContents(currentFolderId)} />
-          {user.role === "ADMIN" && (
-            <Link href="/admin/users"><Button variant="outline">Admin</Button></Link>
-          )}
-          <Button variant="ghost" onClick={logout}>Log out</Button>
         </div>
-      </div>
 
-      <div className="flex gap-2 text-sm text-muted-foreground mb-4">
-        <button
-          onClick={() => navigateToFolder(null)}
-          onDragOver={(e) => { e.preventDefault(); setDragOverRoot(true); }}
-          onDragLeave={() => setDragOverRoot(false)}
-          onDrop={handleRootDrop}
-          className={`hover:underline px-1 rounded ${dragOverRoot ? "bg-primary/10 ring-1 ring-primary" : ""}`}
-        >
-          Root
-        </button>
-        {breadcrumbs.map((b) => (
-          <span key={b.id}>
-            {" / "}
-            <button onClick={() => navigateToFolder(b.id)} className="hover:underline">{b.name}</button>
-          </span>
-        ))}
-      </div>
-
-      <FileDropzone folderId={currentFolderId ?? undefined} onUploadComplete={() => loadContents(currentFolderId)} />
-
-      {loading ? (
-        <p className="mt-6 text-sm text-muted-foreground">Loading...</p>
-      ) : (
-        <div className="mt-6 space-y-2">
-          {folders.map((folder) => (
-            <div
-              key={folder.id}
-              onClick={() => navigateToFolder(folder.id)}
-              onDragOver={(e) => { e.preventDefault(); setDragOverFolderId(folder.id); }}
-              onDragLeave={() => setDragOverFolderId(null)}
-              onDrop={(e) => handleFolderDrop(e, folder.id)}
-              className={`flex justify-between items-center p-3 border rounded-md hover:bg-accent cursor-pointer transition-colors ${dragOverFolderId === folder.id ? "bg-primary/10 ring-2 ring-primary" : ""
-                }`}
-            >
-              <span>📁 {folder.name}</span>
-            </div>
+        <div className="flex gap-2 text-sm text-muted-foreground mb-4">
+          <button
+            onClick={() => navigateToFolder(null)}
+            onDragOver={(e) => { e.preventDefault(); setDragOverRoot(true); }}
+            onDragLeave={() => setDragOverRoot(false)}
+            onDrop={handleRootDrop}
+            className={`hover:underline px-1 rounded ${dragOverRoot ? "bg-primary/10 ring-1 ring-primary" : ""}`}
+          >
+            Root
+          </button>
+          {breadcrumbs.map((b) => (
+            <span key={b.id}>
+              {" / "}
+              <button onClick={() => navigateToFolder(b.id)} className="hover:underline">{b.name}</button>
+            </span>
           ))}
-          {files.map((file) => (
-            <div
-              key={file.id}
-              draggable
-              onDragStart={(e) => handleFileDragStart(e, file.id)}
-              className="flex justify-between items-center p-3 border rounded-md cursor-grab active:cursor-grabbing"
-            >
-              <span
-                className="cursor-pointer hover:underline"
-                onClick={() => setPreviewFile(file)}
+        </div>
+
+        <FileDropzone folderId={currentFolderId ?? undefined} onUploadComplete={() => loadContents(currentFolderId)} />
+
+        {loading ? (
+          <p className="mt-6 text-sm text-muted-foreground">Loading...</p>
+        ) : (
+          <div className="mt-6 space-y-2">
+            {folders.map((folder) => (
+              <div
+                key={folder.id}
+                onClick={() => navigateToFolder(folder.id)}
+                onDragOver={(e) => { e.preventDefault(); setDragOverFolderId(folder.id); }}
+                onDragLeave={() => setDragOverFolderId(null)}
+                onDrop={(e) => handleFolderDrop(e, folder.id)}
+                className={`flex justify-between items-center p-3 border rounded-md hover:bg-accent cursor-pointer transition-colors ${dragOverFolderId === folder.id ? "bg-primary/10 ring-2 ring-primary" : ""
+                  }`}
               >
-                📄 {file.name} <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span></span>
-              <div className="flex gap-2">
-                <ShareModal fileId={file.id} fileName={file.name} />
-                <FileRowActions fileId={file.id} currentFolderId={currentFolderId} onChanged={() => loadContents(currentFolderId)} />
+                <span>📁 {folder.name}</span>
               </div>
-            </div>
-          ))}
-          {previewFile && (
-            <FilePreviewDialog
-              fileId={previewFile.id}
-              fileName={previewFile.name}
-              mimeType={previewFile.mimeType}
-              open={!!previewFile}
-              onOpenChange={(o) => !o && setPreviewFile(null)}
-            />
-          )}
-          {folders.length === 0 && files.length === 0 && (
-            <p className="text-sm text-muted-foreground">This folder is empty.</p>
-          )}
-        </div>
-      )}
-    </div>
+            ))}
+            {files.map((file) => (
+              <div
+                key={file.id}
+                draggable
+                onDragStart={(e) => handleFileDragStart(e, file.id)}
+                className="flex justify-between items-center p-3 border rounded-md cursor-grab active:cursor-grabbing"
+              >
+                <span
+                  className="cursor-pointer hover:underline"
+                  onClick={() => setPreviewFile(file)}
+                >
+                  📄 {file.name} <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span></span>
+                <div className="flex gap-2">
+                  <ShareModal fileId={file.id} fileName={file.name} />
+                  <FileRowActions fileId={file.id} currentFolderId={currentFolderId} onChanged={() => loadContents(currentFolderId)} />
+                </div>
+              </div>
+            ))}
+            {previewFile && (
+              <FilePreviewDialog
+                fileId={previewFile.id}
+                fileName={previewFile.name}
+                mimeType={previewFile.mimeType}
+                open={!!previewFile}
+                onOpenChange={(o) => !o && setPreviewFile(null)}
+              />
+            )}
+            {folders.length === 0 && files.length === 0 && (
+              <p className="text-sm text-muted-foreground">This folder is empty.</p>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

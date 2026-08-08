@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/authContext";
 import { Button } from "@/components/ui/button";
+import { GithubStarButton } from "@/components/GithubStarButton";
 
 export default function Home() {
   const { user } = useAuth();
@@ -32,6 +33,9 @@ export default function Home() {
         <Link href="/register">
           <Button variant="outline">Create account</Button>
         </Link>
+      </div>
+      <div className="absolute top-6 right-6">
+        <GithubStarButton />
       </div>
     </div>
   );
