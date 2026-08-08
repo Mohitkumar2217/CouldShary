@@ -15,7 +15,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     if (!token) return;
-    fetch(`${API_BASE}/verify-email`, {
+    fetch(`${API_BASE}/auth/verify-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

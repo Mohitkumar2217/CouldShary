@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { API_BASE } from "@/lib/config";
 import { useDocumentTitle } from "@/lib/useDocumentTitle";
+import Loading from "../loading";
 
 export default function LoginPage() {
   useDocumentTitle("Log in");
@@ -101,18 +102,7 @@ export default function LoginPage() {
   };
   if (authLoading || user) {
     return (
-      <main className="min-h-screen bg-black text-white">
-        <div className="mx-auto max-w-md px-6 py-20">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8">
-            <div className="flex items-center gap-3">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
-              <p className="text-sm text-zinc-400">
-                Loading...
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
+       <Loading/>
     );
   }
 
