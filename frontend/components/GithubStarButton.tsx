@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 
-const REPO = "Mohitkumar2217/CouldShary";  
+const REPO = "Mohitkumar2217/CouldShary";
 
 export function GithubStarButton() {
   const [stars, setStars] = useState<number | null>(null);
@@ -12,7 +12,7 @@ export function GithubStarButton() {
     fetch(`https://api.github.com/repos/${REPO}`)
       .then((res) => res.json())
       .then((data) => setStars(data.stargazers_count ?? null))
-      .catch(() => setStars(null)); // fine if this fails — just hide the count
+      .catch(() => setStars(null));
   }, []);
 
   return (
@@ -20,12 +20,13 @@ export function GithubStarButton() {
       href={`https://github.com/${REPO}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-1.5 text-sm border rounded-md px-3 py-1.5 hover:bg-accent transition-colors"
-    >
+      className=" inline-flex items-center gap-2 rounded-md border border-black bg-white px-3 py-1.5 text-sm font-medium text-black transition-all duration-200 hover:bg-black hover:text-white " >
       <Star className="h-4 w-4" />
       <span>Star</span>
       {stars !== null && (
-        <span className="text-xs text-muted-foreground border-l pl-1.5 ml-0.5">{stars}</span>
+        <span className="border-l border-black/20 pl-2">
+          {stars}
+        </span>
       )}
     </a>
   );
