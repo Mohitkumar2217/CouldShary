@@ -1,1 +1,1 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://could-shary.vercel.app";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://couldshary.onrender.com";
