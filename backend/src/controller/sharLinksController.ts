@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import { supabaseAdmin } from "../supabase.js";
 import { shareNotificationEmail } from "../templates/emailTemplates.js";
 import { emailQueue } from "../queues/index.js";
+import { Visibility } from "@prisma/client";
 
 export const createLinkController = async (req: Request, res: Response) => {
     try {
@@ -260,6 +261,57 @@ export const passwordDownloadLinkController = async (req: Request, res: Response
         });
     } catch (err) {
         console.log(err);
+        return res.status(500).json({
+            error: "Internal Server Error"
+        });
+    }
+}
+
+export const shareLinksController = async (req: Request, res: Response) => {
+    try{
+        const page = Math.max(1, Number(req.params.page) || 1);
+        const limit = Math.max(1, Number(req.query.limit) || 10);
+        const skip = (page - 1) * limit;
+
+        const [links, total] = await Promise.all([
+            prisma.shareLink.findMany({
+                where: {createdById: req.user?.userId},
+                include: {file: {
+                    select: {name: true}
+                }},
+                orderBy: {createdAt: "desc"},
+                skip,
+                take: limit,
+            }),
+            prisma.shareLink.count({where: {createdById: req.user?.userId}}),
+        ]);
+
+        const now = new Date();
+        const linksWithStatus = links.map((link) => {
+            let status: "active" | "revoked" | "expired" | "limit_reahced" = "active";
+            if(link.revokedAt) status = "revoked";
+            else if (link.expiresAt && link.expiresAt < now) status = "expired";
+            else if(link.maxDownloads && link.downloadCount >= link.maxDownloads) status = "limit_reahced";
+
+            return {
+                id: link.id,
+                token: link.token,
+                fileName: link.file.name,
+                Visibility: link.visibility,
+                status,
+                expiresAt: link.expiresAt,
+                maxDownloads: link.maxDownloads,
+                downloadCount: link.downloadCount,
+                createdAt: link.createdAt,
+                url: `${process.env.FRONTEND_URL}/share/${link.token}`
+            };
+        });
+
+        return res.status(201).json({
+            links: linksWithStatus,
+            pagination: {page, limit, total, totalPages: Math.ceil(total / limit)},
+        })
+    } catch(err) {
         return res.status(500).json({
             error: "Internal Server Error"
         });

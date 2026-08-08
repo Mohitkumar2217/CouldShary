@@ -27,6 +27,7 @@ export function AppHeader() {
         <Link href="/dashboard" className="font-semibold">CloudShary</Link>
         <nav className="flex items-center gap-4">
           {navLink("/dashboard", "Dashboard")}
+          {navLink("/links", "My Links")}
           {navLink("/settings", "Settings")}
           {user.role === "ADMIN" && navLink("/admin/users", "Admin")}
           <GithubStarButton />
