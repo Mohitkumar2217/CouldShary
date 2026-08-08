@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { API_BASE } from "@/lib/config";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export default function ForgotPasswordPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        await fetch("http://localhost:7000/auth/forgot-password", {
+        await fetch(`${API_BASE}/auth/forgot-password`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email }),

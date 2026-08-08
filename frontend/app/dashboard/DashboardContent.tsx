@@ -10,11 +10,15 @@ import { FileRowActions } from "@/components/FileRowActions";
 import { CreateFolderDialog } from "@/components/CreateFolderDialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
+import { FilePreviewDialog } from "@/components/FilePreviewDialog";
+import { useDocumentTitle } from "@/lib/useDocumentTitle";
 
 interface FolderItem { id: string; name: string; }
 interface FileItem { id: string; name: string; size: number; mimeType: string; }
 
 export default function DashboardPage() {
+  useDocumentTitle("Dashboard");
   const { user, logout, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,6 +30,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
   const [dragOverRoot, setDragOverRoot] = useState(false);
+  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
 
   const loadContents = useCallback(async (folderId: string | null) => {
     setLoading(true);
@@ -67,9 +72,10 @@ export default function DashboardPage() {
         method: "PATCH",
         body: JSON.stringify({ newFolderId }),
       });
+      toast.success("File moved");
       loadContents(currentFolderId);
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message); // was: alert(err.message)
     }
   };
 
@@ -152,13 +158,26 @@ export default function DashboardPage() {
               onDragStart={(e) => handleFileDragStart(e, file.id)}
               className="flex justify-between items-center p-3 border rounded-md cursor-grab active:cursor-grabbing"
             >
-              <span>📄 {file.name} <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span></span>
+              <span
+                className="cursor-pointer hover:underline"
+                onClick={() => setPreviewFile(file)}
+              >
+                📄 {file.name} <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span></span>
               <div className="flex gap-2">
                 <ShareModal fileId={file.id} fileName={file.name} />
                 <FileRowActions fileId={file.id} currentFolderId={currentFolderId} onChanged={() => loadContents(currentFolderId)} />
               </div>
             </div>
           ))}
+          {previewFile && (
+            <FilePreviewDialog
+              fileId={previewFile.id}
+              fileName={previewFile.name}
+              mimeType={previewFile.mimeType}
+              open={!!previewFile}
+              onOpenChange={(o) => !o && setPreviewFile(null)}
+            />
+          )}
           {folders.length === 0 && files.length === 0 && (
             <p className="text-sm text-muted-foreground">This folder is empty.</p>
           )}

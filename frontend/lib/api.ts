@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:7000";
+import { API_BASE } from "@/lib/config";
 
 
 let refreshPromise: Promise<string | null> | null = null;

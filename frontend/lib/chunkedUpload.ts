@@ -1,7 +1,7 @@
 import { getFileFingerprint, getUploadSession, saveUploadSession, deleteUploadSession } from "./uploadSessionStore";
+import { API_BASE } from "@/lib/config";
 
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
-const API_BASE = "http://localhost:7000";
 
 export async function uploadFileChunked(
   file: File,

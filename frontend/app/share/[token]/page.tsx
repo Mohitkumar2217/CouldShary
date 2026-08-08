@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const API_BASE = "http://localhost:7000";
+import { API_BASE } from "@/lib/config";
 
 export default function SharePage() {
   const { token } = useParams();

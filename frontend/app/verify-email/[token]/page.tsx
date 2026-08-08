@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { API_BASE } from "@/lib/config";
 
 export default function VerifyEmailPage() {
   const { token } = useParams();
@@ -10,7 +11,7 @@ export default function VerifyEmailPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:7000/auth/verify-email", {
+    fetch(`${API_BASE}/verify-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),

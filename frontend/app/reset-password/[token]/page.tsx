@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { API_BASE } from "@/lib/config";
 
 export default function ResetPasswordPage() {
     const { token } = useParams();
@@ -25,7 +26,7 @@ export default function ResetPasswordPage() {
 
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:7000/auth/reset-password", {
+            const res = await fetch(`${API_BASE}/auth/reset-password`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token, newPassword: password }),

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { API_BASE } from "@/lib/config";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -23,7 +25,7 @@ export default function SettingsPage() {
         setError(null);
         try {
             const token = localStorage.getItem("accessToken");
-            const res = await fetch("http://localhost:7000/auth/account", {
+            const res = await fetch(`${API_BASE}/auth/account`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,6 +44,14 @@ export default function SettingsPage() {
             setLoading(false);
         }
     };
+
+
+    useEffect(() => {
+        if (!user) {
+            router.push("/login");
+        }
+    }, [user, router]);
+
 
     if (!user) return null;
 

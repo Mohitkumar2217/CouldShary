@@ -7,8 +7,11 @@ import { useAuth } from "@/lib/authContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { API_BASE } from "@/lib/config";
+import { useDocumentTitle } from "@/lib/useDocumentTitle";
 
 export default function LoginPage() {
+  useDocumentTitle("Log in");
   const router = useRouter();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
@@ -25,7 +28,7 @@ export default function LoginPage() {
     setUnverified(false);
     setResendMessage(null);
     try {
-      const res = await fetch("http://localhost:7000/auth/login", {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -48,7 +51,7 @@ export default function LoginPage() {
 
   const handleResend = async () => {
     setResendMessage(null);
-    const res = await fetch("http://localhost:7000/auth/resend-verification", {
+    const res = await fetch(`${API_BASE}/auth/resend-verification`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -60,6 +63,17 @@ export default function LoginPage() {
   return (
     <div className="max-w-sm mx-auto mt-24 p-6 border rounded-lg">
       <h1 className="text-xl font-semibold mb-6">Log in</h1>
+      <div className="mb-4 p-3 bg-muted rounded-md text-sm">
+        <p className="text-muted-foreground mb-1">Just want to look around?</p>
+        <p className="font-mono text-xs">systemfirst307@gamil.com / Deamon@123</p>
+        <button
+          type="button"
+          onClick={() => { setEmail("systemfirst307@gmail.com"); setPassword("Deamon@123"); }}
+          className="text-xs underline mt-1"
+        >
+          Autofill demo credentials
+        </button>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="email">Email</Label>
