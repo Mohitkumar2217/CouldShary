@@ -2,7 +2,7 @@
 
 A full-stack file sharing platform with drag-and-drop uploads, chunked/resumable large file support, folder organization, and public/private share links with password protection and expiration.
 
-**Live demo:** `[https://your-project.vercel.app](https://could-shary.vercel.app/)` — login with `systemfirst307@gmail.com` / `Demo@123` to look around without registering.
+**Live demo:** `https://your-project.vercel.app` — login with `systemfirst307@gmail.com` / `Deamon@123` to look around without registering.
 
 ---
 
