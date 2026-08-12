@@ -1,0 +1,1394 @@
+{
+  "info": {
+    "_postman_id": "b826644c-aa73-4c21-9b0d-9709883d19cc",
+    "name": "CloudShary",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46201666",
+    "_collection_link": "https://go.postman.co/collection/46201666-b826644c-aa73-4c21-9b0d-9709883d19cc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "register",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_1604}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"mohitew@gmail.com\",\r\n    \"password\": \"Mohit@22\",\r\n    \"name\": \"mohit kumar kumawat\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_1604}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"mohitew@gmail.com\",\r\n    \"password\": \"Mohit@22\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "me",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0d5t}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/me",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "health",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0d5t}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:7000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "upload",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1bzi}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "uuid": "3292a3cc-bdf2-49f0-8240-627c5266e8f3",
+              "src": "/C:/Users/Mohit Kumawat/Downloads/Mohit_Kumar_SDE.pdf"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/upload",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "upload"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "uploadinitialize",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0ab9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"filename\": \"Mohit_Kumar_SDE.pdf\",\r\n  \"mimetype\": \"file/pdf\",\r\n  \"size\": 102400,\r\n  \"totalChunks\": 5,\r\n  \"folderId\": null\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/upload/init",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "upload",
+            "init"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "chunkupload",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0ab9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"filename\": \"Mohit_Kumar_SDE.pdf\",\r\n  \"mimetype\": \"file/pdf\",\r\n  \"size\": 102400,\r\n  \"totalChunks\": 5,\r\n  \"folderId\": null\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/upload/chunk/RqrKjAKz8jHa9BRlk9ki1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "upload",
+            "chunk",
+            "RqrKjAKz8jHa9BRlk9ki1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "status",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_0ab9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/upload/status/RqrKjAKz8jHa9BRlk9ki1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "upload",
+            "status",
+            "RqrKjAKz8jHa9BRlk9ki1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "complete",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0ab9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/upload/complete/RqrKjAKz8jHa9BRlk9ki1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "upload",
+            "complete",
+            "RqrKjAKz8jHa9BRlk9ki1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "download",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_16bi}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/1/download",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "1",
+            "download"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createFolder",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0mp5}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\":\"Documents\"\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "nestedFolder",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_0jjd}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\":\"Invoices\", \r\n    \"parentFolderId\":\"8748e9fd-2c63-42e1-9146-41e3a9f3f1b7\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "contents",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0y4u}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:7000/folders",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "foldercontent",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0y4u}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders?folderId=8748e9fd-2c63-42e1-9146-41e3a9f3f1b7&name=NewDocuments",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders"
+          ],
+          "query": [
+            {
+              "key": "folderId",
+              "value": "8748e9fd-2c63-42e1-9146-41e3a9f3f1b7"
+            },
+            {
+              "key": "name",
+              "value": "NewDocuments"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "subfolder",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_188y}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:7000/folders/e8010cd0-ad54-46ec-88f4-9b7a58e35a23/breadcrumbs",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders",
+            "e8010cd0-ad54-46ec-88f4-9b7a58e35a23",
+            "breadcrumbs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "renamefolder",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_188y}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"NewDocuments\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders/e8010cd0-ad54-46ec-88f4-9b7a58e35a23",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders",
+            "e8010cd0-ad54-46ec-88f4-9b7a58e35a23"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "movefolder",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_188y}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"newParentFolderId\":\"82981bb0-b223-4610-b546-69e93601b0d7\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders/e8010cd0-ad54-46ec-88f4-9b7a58e35a23/move",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders",
+            "e8010cd0-ad54-46ec-88f4-9b7a58e35a23",
+            "move"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "movefile",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_188y}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"newFolderId\":\"e8010cd0-ad54-46ec-88f4-9b7a58e35a23\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders/files/3222e7b3-7c2c-4881-97bb-b8e28efe7a16/move",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders",
+            "files",
+            "3222e7b3-7c2c-4881-97bb-b8e28efe7a16",
+            "move"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deleteFolder",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_188y}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/folders/e8010cd0-ad54-46ec-88f4-9b7a58e35a23",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "folders",
+            "e8010cd0-ad54-46ec-88f4-9b7a58e35a23"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createlink",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_0dqy}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"visibility\": \"PUBLIC\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/44ba392c-fa85-40c7-8616-9194623a7da0/share",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "44ba392c-fa85-40c7-8616-9194623a7da0",
+            "share"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "publiclink",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1bzi}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://localhost:7000/share/6HlVAmsQKA6d",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "share",
+            "6HlVAmsQKA6d"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "downloadlink",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0dqy}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:7000/share/6HlVAmsQKA6d/download",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "share",
+            "6HlVAmsQKA6d",
+            "download"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "passprotected",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0dqy}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"visibility\":\"PUBLIC\",\"password\":\"mySecret123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/44ba392c-fa85-40c7-8616-9194623a7da0/share",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "44ba392c-fa85-40c7-8616-9194623a7da0",
+            "share"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "checkmetadata",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1bzi}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://localhost:7000/share/O9mWsTw4xVKX",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "share",
+            "O9mWsTw4xVKX"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "downloadpasslink",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_0dqy}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"password\":\"mySecret123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/share/O9mWsTw4xVKX/download",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "share",
+            "O9mWsTw4xVKX",
+            "download"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "expirelink",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0msm}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"visibility\":\"PUBLIC\",\"expiresAt\":\"2020-01-01T00:00:00.000Z\"}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/44ba392c-fa85-40c7-8616-9194623a7da0/share",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "44ba392c-fa85-40c7-8616-9194623a7da0",
+            "share"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "maxdownlod",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_0msm}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"visibility\":\"PUBLIC\",\"maxDownloads\":1}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/44ba392c-fa85-40c7-8616-9194623a7da0/share",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "44ba392c-fa85-40c7-8616-9194623a7da0",
+            "share"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "limitdownload",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_0dqy}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"visibility\":\"PUBLIC\",\"expiresAt\":\"2020-01-01T00:00:00.000Z\"}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/share/-noNUlRIDdT8/download",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "share",
+            "-noNUlRIDdT8",
+            "download"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deletelink",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_10fg}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:7000/share/9690b040-c0a8-406e-8a37-bb9ae8f935a8",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "share",
+            "9690b040-c0a8-406e-8a37-bb9ae8f935a8"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "listlinks",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_10fg}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"password\":\"mySecret123\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:7000/files/44ba392c-fa85-40c7-8616-9194623a7da0/share",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "files",
+            "44ba392c-fa85-40c7-8616-9194623a7da0",
+            "share"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deleteUser",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{auth_secret_14eu}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"password\": \"Mohit@22\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7000/auth/account",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7000",
+          "path": [
+            "auth",
+            "account"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deleteuser",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "supabase_service_role_api_key_1604",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_0d5t",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1bzi",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0ab9",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_0ab9",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_0ab9",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_16bi",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_0mp5",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0jjd",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_0y4u",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_188y",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_188y",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_188y",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0dqy",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_0dqy",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_0msm",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_10fg",
+      "secret": true
+    },
+    {
+      "key": "auth_secret_14eu",
+      "secret": true
+    }
+  ]
+}
