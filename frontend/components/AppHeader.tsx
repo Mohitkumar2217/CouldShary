@@ -58,6 +58,8 @@ export function AppHeader() {
         <nav className="hidden gap-1 sm:flex">
           {navLink("/dashboard", "Dashboard")}
           {navLink("/links", "Links")} 
+          {navLink("/docs", "Docs")}
+          {navLink("/demo", "Demo")}
           {user.role === "ADMIN" && navLink("/admin/users", "Admin")}
         </nav>
 
@@ -118,6 +120,8 @@ export function AppHeader() {
         className=" flex gap-1 overflow-x-auto border-t border-zinc-200 px-4 py-2 sm:hidden">
         {navLink("/dashboard", "Dashboard")}
         {navLink("/links", "My Links")}
+        {navLink("/docs", "Docs")}
+        {navLink("/demo", "Demo")}
         {navLink("/settings", "Settings")}
         {user.role === "ADMIN" && navLink("/admin/users", "Admin")}
       </nav>

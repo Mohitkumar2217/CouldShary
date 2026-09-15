@@ -98,16 +98,16 @@ export function FileDropzone({
           setIsDragging(false);
         }}
         onDrop={handleDrop}
-        className={`relative flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-dashed px-6 py-10 text-center transition-all duration-200 ${isDragging ? "border-white bg-zinc-900" : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"} ${uploading ? "cursor-not-allowed opacity-80" : "cursor-default"}`}
+        className={`relative flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-dashed px-6 py-10 text-center transition-all duration-200 ${isDragging ? "border-zinc-700 bg-zinc-100" : "border-zinc-300 bg-white hover:border-zinc-400"} ${uploading ? "cursor-not-allowed opacity-80" : "cursor-default"}`}
       >
-        <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl border transition-colors ${isDragging ? "border-zinc-600 bg-zinc-800" : "border-zinc-800 bg-black"}`}>
+        <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl border transition-colors ${isDragging ? "border-zinc-400 bg-zinc-200" : "border-zinc-200 bg-zinc-50"}`}>
           {uploading ? (
-            <svg className="h-5 w-5 animate-spin text-white" viewBox="0 0 24 24" fill="none" >
+            <svg className="h-5 w-5 animate-spin text-zinc-950" viewBox="0 0 24 24" fill="none" >
               <circle cx="12" cy="12" r="9" className="opacity-20" stroke="currentColor" strokeWidth="2" />
               <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           ) : (
-            <svg className="h-5 w-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
+            <svg className="h-5 w-5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4" />
               <path strokeLinecap="round" strokeLinejoin="round" d="m7 9 5-5 5 5" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 20h14" />
@@ -117,7 +117,7 @@ export function FileDropzone({
 
         {uploading ? (
           <>
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-zinc-950">
               Uploading file
             </p>
 
@@ -127,7 +127,7 @@ export function FileDropzone({
           </>
         ) : isDragging ? (
           <>
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-zinc-950">
               Drop your file here
             </p>
 
@@ -137,11 +137,11 @@ export function FileDropzone({
           </>
         ) : (
           <>
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-zinc-950">
               Drag and drop your file here
             </p>
 
-            <p className="mt-1 text-xs text-zinc-600">
+            <p className="mt-1 text-xs text-zinc-500">
               or select a file from your computer
             </p>
           </>
@@ -151,18 +151,18 @@ export function FileDropzone({
           <div className="mt-6 w-full max-w-sm">
 
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs text-zinc-600">
+              <span className="text-xs text-zinc-500">
                 Upload progress
               </span>
 
-              <span className="text-xs font-medium text-zinc-300">
+              <span className="text-xs font-medium text-zinc-700">
                 {progress}%
               </span>
             </div>
 
-            <div className="h-1.5 overflow-hidden rounded-full bg-zinc-800">
+            <div className="h-1.5 overflow-hidden rounded-full bg-zinc-200">
               <div
-                className="h-full rounded-full bg-white transition-all duration-300"
+                className="h-full rounded-full bg-zinc-950 transition-all duration-300"
                 style={{
                   width: `${progress}%`,
                 }}
@@ -179,7 +179,7 @@ export function FileDropzone({
               type="button"
               variant="outline"
               onClick={() => document.getElementById("file-input")?.click()}
-              className="border-zinc-800 bg-black text-zinc-300 hover:border-zinc-600 hover:bg-zinc-900 hover:text-white">
+              className="border-zinc-200 bg-white text-zinc-800 hover:border-zinc-400 hover:bg-zinc-950 hover:text-white">
               Browse files
             </Button>
 
@@ -194,7 +194,7 @@ export function FileDropzone({
       </div>
 
       {message && (
-        <div className={`mt-3 rounded-lg border px-4 py-3 ${message.startsWith("Error:") ? "border-zinc-800 bg-zinc-950" : "border-zinc-800 bg-zinc-950"}`}>
+        <div className="mt-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
           <div className="flex items-start gap-3">
             <div className="mt-0.5">
               {message.startsWith("error") ? (
@@ -204,13 +204,13 @@ export function FileDropzone({
                   <path strokeLinecap="round" d="M12 16h.01" />
                 </svg>
               ) : (
-                <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
+                <svg className="h-4 w-4 text-zinc-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
                   <circle cx="12" cy="12" r="9" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="m8 12 2.5 2.5L16 9" />
                 </svg>
               )}
             </div>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-zinc-600">
               {message}
             </p>
 

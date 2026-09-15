@@ -176,16 +176,16 @@ export default function DashboardContent() {
     return null;
   } 
   return (
-    <div className="min-h-screen bg-black text-white"> 
+    <div className="min-h-screen bg-zinc-50 text-zinc-950"> 
       <AppHeader /> 
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6"> 
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-3xl font-semibold tracking-tight">
               My Files
             </h1>
 
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-2 text-sm text-zinc-600">
               Manage your files and folders.
             </p>
           </div>
@@ -204,18 +204,18 @@ export default function DashboardContent() {
               setDragOverRoot(false)
             }
             onDrop={handleRootDrop}
-            className={` shrink-0 rounded-md px-2 py-1 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white ${ dragOverRoot ? "bg-zinc-900 text-white ring-1 ring-zinc-600" : "" } `}
+            className={` shrink-0 rounded-md px-2 py-1 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-950 ${ dragOverRoot ? "bg-zinc-200 text-zinc-950 ring-1 ring-zinc-400" : "" } `}
           >
             Root
           </button>
           {breadcrumbs.map((b) => (
             <div key={b.id} className="flex shrink-0 items-center gap-1.5" >
-              <span className="text-zinc-700">/</span>
+              <span className="text-zinc-300">/</span>
               <button
                 onClick={() =>
                   navigateToFolder(b.id)
                 }
-                className=" rounded-md px-2 py-1 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white "
+                className=" rounded-md px-2 py-1 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-950 "
               >
                 {b.name}
               </button>
@@ -227,7 +227,7 @@ export default function DashboardContent() {
         </div>
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-medium text-zinc-200">
+            <h2 className="text-sm font-semibold text-zinc-950">
               Files & folders
             </h2>
             <p className="mt-0.5 text-xs text-zinc-600">
@@ -237,7 +237,7 @@ export default function DashboardContent() {
           </div>
         </div> 
         {loading ? (
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-10">
+          <div className="rounded-xl border border-zinc-200 bg-white p-10">
             <div className="flex items-center justify-center gap-3">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
               <p className="text-sm text-zinc-500">
@@ -246,11 +246,11 @@ export default function DashboardContent() {
             </div>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+          <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
 
             {(folders.length > 0 ||
               files.length > 0) && (
-              <div className=" hidden border-b border-zinc-800 px-4 py-2.5 text-xs font-medium text-zinc-600 sm:grid sm:grid-cols-[1fr_120px] " >
+              <div className=" hidden border-b border-zinc-200 px-4 py-2.5 text-xs font-medium text-zinc-500 sm:grid sm:grid-cols-[1fr_120px] " >
                 <span>Name</span>
                 <span className="text-right">
                   Actions
@@ -278,17 +278,17 @@ export default function DashboardContent() {
                     folder.id
                   )
                 }
-                className={`group flex cursor-pointer items-center justify-between border-b border-zinc-800 px-4 py-3.5 transition-colors hover:bg-zinc-900/70 ${  dragOverFolderId === folder.id  ? "bg-zinc-900 ring-1 ring-inset ring-zinc-600"  : "" } `}
+                className={`group flex cursor-pointer items-center justify-between border-b border-zinc-200 px-4 py-3.5 transition-colors hover:bg-zinc-50 ${  dragOverFolderId === folder.id  ? "bg-zinc-100 ring-1 ring-inset ring-zinc-400"  : "" } `}
               >
                 <div className="flex min-w-0 items-center gap-3"> 
-                  <div className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 " >
-                    <svg className="h-4 w-4 text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
+                  <div className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 " >
+                    <svg className="h-4 w-4 text-zinc-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2h8.5A1.5 1.5 0 0 1 21 9.5v7A1.5 1.5 0 0 1 19.5 18h-15A1.5 1.5 0 0 1 3 16.5v-9Z" />
                     </svg>
                   </div>
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-zinc-200">
+                    <p className="truncate text-sm font-medium text-zinc-900">
                       {folder.name}
                     </p>
                     <p className="text-xs text-zinc-600">
@@ -296,7 +296,7 @@ export default function DashboardContent() {
                     </p>
                   </div>
                 </div>
-                <div className="hidden text-xs text-zinc-700 sm:block">
+                <div className="hidden text-xs text-zinc-500 sm:block">
                   Open →
                 </div>
               </div>
@@ -311,22 +311,22 @@ export default function DashboardContent() {
                     file.id
                   )
                 }
-                className=" group flex cursor-grab items-center justify-between border-b border-zinc-800 px-4 py-3.5 transition-colors hover:bg-zinc-900/70 active:cursor-grabbing "
+                className=" group flex cursor-grab items-center justify-between border-b border-zinc-200 px-4 py-3.5 transition-colors hover:bg-zinc-50 active:cursor-grabbing "
               >
                 <div className=" flex min-w-0 cursor-pointer items-center gap-3 "
                   onClick={() =>
                     setPreviewFile(file)
                   }
                 > 
-                  <div className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 " >
-                    <svg className="h-4 w-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
+                  <div className=" flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 " >
+                    <svg className="h-4 w-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h8l4 4v14H6V3Z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5" />
                     </svg>
                   </div>
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-zinc-200 transition-colors group-hover:text-white">
+                    <p className="truncate text-sm font-medium text-zinc-900 transition-colors group-hover:text-zinc-600">
                       {file.name}
                     </p>
                     <p className="mt-0.5 text-xs text-zinc-600">
@@ -356,12 +356,12 @@ export default function DashboardContent() {
             {folders.length === 0 &&
               files.length === 0 && (
                 <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-                  <div className=" mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 " >
+                  <div className=" mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 " >
                     <svg className="h-5 w-5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 6.5A1.5 1.5 0 0 1 5.5 5h4l2 2h7A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-11Z" />
                     </svg>
                   </div>
-                  <h3 className="text-sm font-medium text-zinc-300">
+                  <h3 className="text-sm font-medium text-zinc-900">
                     This folder is empty
                   </h3>
 
